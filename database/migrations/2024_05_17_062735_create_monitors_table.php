@@ -20,8 +20,10 @@ return new class extends Migration
             $table->integer('expected_status_code');
 
             $table->integer('frequency')->default(5);
-            $table->integer('timeout')->default(60);
             $table->boolean('active')->default(true);
+
+            $table->string('method')->nullable();
+            $table->integer('timeout')->nullable();
 
             $table->timestamp('last_checked_at')->nullable();
 

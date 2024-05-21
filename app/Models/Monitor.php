@@ -3,12 +3,18 @@
 namespace App\Models;
 
 use App\Enums\ActionType;
+use App\Enums\HttpMethod;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Monitor extends Model
 {
     use HasFactory;
+
+    protected $hidden = [
+        'created_at',
+        'updated_at',
+    ];
 
     protected $fillable = [
         'name',
@@ -23,6 +29,7 @@ class Monitor extends Model
 
     protected $casts = [
         'type' => ActionType::class,
+        'method' => HttpMethod::class,
         'active' => 'boolean',
         'last_checked_at' => 'datetime',
     ];

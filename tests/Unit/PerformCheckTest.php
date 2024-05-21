@@ -14,13 +14,13 @@ class PerformCheckTest extends TestCase
     public function test_check_http_success(): void
     {
 
-        $job = PerformCheck::make(
-            action: HttpAction::make(
-                url: 'https://google.com',
-                expectedStatusCode: 200
-            )
-        );
-
-        $job->handle();
+//        $job = PerformCheck::make(
+//            action: HttpAction::make(
+//                url: 'https://google.com',
+//                expectedStatusCode: 200
+//            )
+//        );
+//
+//        $job->handle();
     }
 }

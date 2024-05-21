@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Enums\ActionType;
+use App\Enums\HttpMethod;
 use App\Models\Monitor;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -23,6 +24,7 @@ class MonitorFactory extends Factory
             'type' => ActionType::HTTP,
             'url' => $this->faker->url,
             'expected_status_code' => 200,
+            'method' => HttpMethod::GET,
             'frequency' => 5,
             'timeout' => 60,
             'active' => true,
