@@ -2,16 +2,15 @@
 
 namespace App\Jobs;
 
+use App\Actions\MonitorStrategies\HttpMonitorStrategy;
+use App\Actions\PerformCheckAction;
+use App\Models\Monitor;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Http;
-
-use function Laravel\Prompts\spin;
-use function Laravel\Prompts\table;
-use function Laravel\Prompts\text;
+use Illuminate\Support\Facades\Pipeline;
 
 class PerformCheck implements ShouldQueue
 {
@@ -20,9 +19,9 @@ class PerformCheck implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct()
-    {
-        //
+    public function __construct(
+        readonly int $monitorId
+    ) {
     }
 
     /**
@@ -31,25 +30,25 @@ class PerformCheck implements ShouldQueue
     public function handle(): void
     {
 
-        $url = text(
-            label: 'Enter the URL to check',
-            default: 'https://google.com'
+        // 1. Get the monitor
+        $monitor = Monitor::find($this->monitorId);
+
+        Pipeline::send($monitor)
+            ->through([
+                PerformCheckAction::class
+            ])
+            ->thenReturn();
+
+
+
+        // 2. Create a new HttpMonitorStrategy
+        $strategy = HttpMonitorStrategy::make(
+            $monitor->toArray()
         );
 
-        $startTime = microtime(true);
+        // 3. Check the monitor
+        $strategy->check();
 
-        $response = spin(
-            fn () => Http::get($url),
-            'Checking URL...'
-        );
-
-        $endTime = microtime(true);
-        $executionTime = ($endTime - $startTime) * 1000;
-
-        table([
-            ['Status', $response->status()],
-            ['Response Time', $executionTime],
-        ]);
-
+        // 4. Dispatch a new CheckCompleted event
     }
 }
