@@ -97,6 +97,27 @@ class HttpMonitorStrategyTest extends TestCase
         ]);
     }
 
+    public function test_check_is_returned(): void
+    {
+        Http::fake([
+            self::URL => Http::response(),
+        ]);
+
+        $monitor = Monitor::factory()->create([
+            'type' => ActionType::HTTP,
+            'url' => self::URL,
+        ]);
+
+        $strategy = HttpMonitorStrategy::make(
+            attributes: $monitor->toArray()
+        );
+
+        $check = $strategy->check();
+
+        $this->assertNotNull($check);
+        $this->assertThat($check->monitor_id, $this->equalTo($monitor->id));
+    }
+
     public static function methodProvider(): array
     {
         return [

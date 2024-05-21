@@ -2,14 +2,17 @@
 
 namespace App\Jobs;
 
-use App\Actions\MonitorStrategies\HttpMonitorStrategy;
 use App\Actions\PerformCheckAction;
+use App\Actions\PerformCheckNotification;
+use App\Actions\PerformCheckValidation;
+use App\DTOs\MonitorPassableDTO;
 use App\Models\Monitor;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Pipeline;
 
 class PerformCheck implements ShouldQueue
@@ -29,26 +32,19 @@ class PerformCheck implements ShouldQueue
      */
     public function handle(): void
     {
-
-        // 1. Get the monitor
-        $monitor = Monitor::find($this->monitorId);
-
-        Pipeline::send($monitor)
-            ->through([
-                PerformCheckAction::class
-            ])
-            ->thenReturn();
-
-
-
-        // 2. Create a new HttpMonitorStrategy
-        $strategy = HttpMonitorStrategy::make(
-            $monitor->toArray()
+        $passable = MonitorPassableDTO::make(
+            monitor: Monitor::find($this->monitorId)
         );
 
-        // 3. Check the monitor
-        $strategy->check();
+        $result = Pipeline::send($passable)->through([
+            PerformCheckAction::class,
+            PerformCheckValidation::class,
+            PerformCheckNotification::class,
+        ])->thenReturn();
 
-        // 4. Dispatch a new CheckCompleted event
+        Log::debug('Check performed', [
+            'monitor_id' => $this->monitorId,
+            'result' => $result,
+        ]);
     }
 }

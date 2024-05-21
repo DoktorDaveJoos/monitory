@@ -6,11 +6,9 @@ use App\Enums\HttpMethod;
 use App\Models\Check;
 use App\Models\Monitor;
 use BadMethodCallException;
-use Exception;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 class HttpMonitorStrategy implements MonitorStrategy
@@ -28,7 +26,7 @@ class HttpMonitorStrategy implements MonitorStrategy
     /**
      * @throws ConnectionException
      */
-    public function check(): int
+    public function check(): Check
     {
         $start = microtime(true);
 
@@ -44,28 +42,21 @@ class HttpMonitorStrategy implements MonitorStrategy
         // In ms
         $response_time = ($end - $start) * 1000;
 
-        try {
-            Check::create([
-                'monitor_id' => $this->monitor_id,
-                'status_code' => $response->status(),
-                'response_time' => (int) $response_time,
-                'response_body' => $response->body() ?? null,
-                'response_headers' => $response->headers() ? json_encode($response->headers()) : null,
-                'started_at' => $start,
-                'finished_at' => $end,
-            ]);
+        $check = Check::create([
+            'monitor_id' => $this->monitor_id,
+            'status_code' => $response->status(),
+            'response_time' => (int) $response_time,
+            'response_body' => $response->body() ?? null,
+            'response_headers' => $response->headers() ? json_encode($response->headers()) : null,
+            'started_at' => $start,
+            'finished_at' => $end,
+        ]);
 
-            Monitor::find($this->monitor_id)->update([
-                'last_check' => now(),
-            ]);
+        Monitor::find($this->monitor_id)->update([
+            'last_check' => now(),
+        ]);
 
-            return self::SUCCESS;
-        } catch (Exception $e) {
-            Log::error($e->getMessage());
-
-            return self::FAILURE;
-        }
-
+        return $check;
     }
 
     /**
@@ -76,8 +67,8 @@ class HttpMonitorStrategy implements MonitorStrategy
         HttpMethod $method,
         int $timeout,
         int $connectTimout,
-        string $url): Response
-    {
+        string $url
+    ): Response {
         $client = Http::timeout($timeout)
             ->connectTimeout($connectTimout);
 
@@ -97,5 +88,14 @@ class HttpMonitorStrategy implements MonitorStrategy
             method: HttpMethod::tryFrom($attributes['method']),
             expectedStatusCode: $attributes['expected_status_code'],
         );
+    }
+
+    public function validate(): void
+    {
+
+        $monitor = Monitor::find($this->monitor_id);
+
+
+
     }
 }

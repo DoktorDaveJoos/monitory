@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Log;
 use Lorisleiva\Actions\Concerns\AsAction;
 use Throwable;
 
-class PerformCheckAction
+class PerformCheckValidation
 {
     use AsAction;
 
@@ -17,16 +17,14 @@ class PerformCheckAction
      */
     public function handle(MonitorPassableDTO $monitorPassableDTO, Closure $next)
     {
-        Log::debug( 'Performing action for monitor', [
+        Log::debug('Performing validation for check', [
             'monitor_id' => $monitorPassableDTO->monitor->id,
             'monitor_type' => $monitorPassableDTO->monitor->type->value,
         ]);
 
-        $check = $monitorPassableDTO->monitor->type
+        $monitorPassableDTO->monitor->type
             ->strategy($monitorPassableDTO->monitor->toArray())
-            ->check();
-
-        $monitorPassableDTO->setCheck($check);
+            ->validate();
 
         return $next($monitorPassableDTO);
     }

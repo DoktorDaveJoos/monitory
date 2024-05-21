@@ -9,7 +9,7 @@ enum ActionType: string
 {
     case HTTP = 'http';
 
-    public function strategy(...$attributes): MonitorStrategy
+    public function strategy($attributes): MonitorStrategy
     {
         return match ($this) {
             self::HTTP => HttpMonitorStrategy::make($attributes),
