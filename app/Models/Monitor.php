@@ -7,6 +7,17 @@ use App\Enums\HttpMethod;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @property int id
+ * @property string name
+ * @property ActionType type
+ * @property string url
+ * @property int expected_status_code
+ * @property int frequency
+ * @property int timeout
+ * @property bool active
+ * @property string last_checked_at
+ */
 class Monitor extends Model
 {
     use HasFactory;
@@ -38,5 +49,4 @@ class Monitor extends Model
     {
         return $query->where('active', true);
     }
-
 }

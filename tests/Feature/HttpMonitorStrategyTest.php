@@ -18,18 +18,18 @@ class HttpMonitorStrategyTest extends TestCase
 {
     use RefreshDatabase;
 
+    const URL = 'https://example.com';
+
     #[DataProvider('methodProvider')]
     public function test_check_created_with_method(HttpMethod $method): void
     {
-        $url = 'https://example.com';
-
         Http::fake([
-            $url => Http::response(),
+            self::URL => Http::response(),
         ]);
 
         $monitor = Monitor::factory()->create([
             'type' => ActionType::HTTP,
-            'url' => $url,
+            'url' => self::URL,
             'method' => $method,
         ]);
 
@@ -51,15 +51,13 @@ class HttpMonitorStrategyTest extends TestCase
     #[DataProvider('expectedStatusCodeProvider')]
     public function test_check_created_with_status_code(int $status): void
     {
-        $url = 'https://example.com';
-
         Http::fake([
-            $url => Http::response(status: $status),
+            self::URL => Http::response(status: $status),
         ]);
 
         $monitor = Monitor::factory()->create([
             'type' => ActionType::HTTP,
-            'url' => $url,
+            'url' => self::URL,
             'expected_status_code' => $status,
         ]);
 

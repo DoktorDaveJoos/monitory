@@ -16,6 +16,7 @@ return new class extends Migration
 
             $table->string('name');
             $table->string('type');
+
             $table->string('url');
             $table->integer('expected_status_code');
 
@@ -24,6 +25,7 @@ return new class extends Migration
 
             $table->string('method')->nullable();
             $table->integer('timeout')->nullable();
+            $table->integer('connection_timeout')->nullable();
 
             $table->timestamp('last_checked_at')->nullable();
 

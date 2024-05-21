@@ -4,9 +4,13 @@ namespace App\Actions\MonitorStrategies;
 
 use App\Enums\HttpMethod;
 use App\Models\Check;
+use App\Models\Monitor;
 use BadMethodCallException;
+use Exception;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 class HttpMonitorStrategy implements MonitorStrategy
@@ -21,39 +25,67 @@ class HttpMonitorStrategy implements MonitorStrategy
     ) {
     }
 
-    public function check(): void
+    /**
+     * @throws ConnectionException
+     */
+    public function check(): int
     {
-        // Perform the HTTP request
         $start = microtime(true);
-        $response = self::httpWithMethod($this->method, $this->url);
+
+        $response = self::performHttpRequest(
+            method: $this->method,
+            timeout: 60,
+            connectTimout: 30,
+            url: $this->url
+        );
+
         $end = microtime(true);
 
         // In ms
         $response_time = ($end - $start) * 1000;
 
-        // Save the check
-        Check::create([
-            'monitor_id' => $this->monitor_id,
-            'status_code' => $response->status(),
-            'response_time' => (int) $response_time,
-            'response_body' => $response->body() ?? null,
-            'response_headers' => $response->headers() ? json_encode($response->headers()) : null,
-            'started_at' => $start,
-            'finished_at' => $end,
-        ]);
+        try {
+            Check::create([
+                'monitor_id' => $this->monitor_id,
+                'status_code' => $response->status(),
+                'response_time' => (int) $response_time,
+                'response_body' => $response->body() ?? null,
+                'response_headers' => $response->headers() ? json_encode($response->headers()) : null,
+                'started_at' => $start,
+                'finished_at' => $end,
+            ]);
+
+            Monitor::find($this->monitor_id)->update([
+                'last_check' => now(),
+            ]);
+
+            return self::SUCCESS;
+        } catch (Exception $e) {
+            Log::error($e->getMessage());
+
+            return self::FAILURE;
+        }
 
     }
 
     /**
      * @throws BadMethodCallException
+     * @throws ConnectionException
      */
-    private static function httpWithMethod(HttpMethod $method, string $url): Response
+    private static function performHttpRequest(
+        HttpMethod $method,
+        int $timeout,
+        int $connectTimout,
+        string $url): Response
     {
+        $client = Http::timeout($timeout)
+            ->connectTimeout($connectTimout);
+
         return match ($method) {
-            HttpMethod::GET => Http::get($url),
-            HttpMethod::POST => Http::post($url),
-            HttpMethod::PUT => Http::put($url),
-            HttpMethod::DELETE => Http::delete($url),
+            HttpMethod::GET => $client->get($url),
+            HttpMethod::POST => $client->post($url),
+            HttpMethod::PUT => $client->put($url),
+            HttpMethod::DELETE => $client->delete($url),
         };
     }
 
