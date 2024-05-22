@@ -62,11 +62,6 @@ class PerformCheckValidation
 
     protected static function compare($checkValue, $operator, $value): bool
     {
-
-        if ($operator === Operator::GREATER_THAN) {
-            dump($checkValue > $value);
-        }
-
         return match ($operator) {
             Operator::EQUALS => $checkValue === $value,
             Operator::NOT_EQUALS => $checkValue !== $value,
