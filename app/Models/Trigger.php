@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Enums\ComparisonOperator;
+use App\Enums\Operator;
 use App\Enums\TriggerType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int id
  * @property int monitor_id
  * @property TriggerType type
- * @property ComparisonOperator operator
+ * @property Operator operator
  * @property int value
  */
 class Trigger extends Model
@@ -27,7 +27,7 @@ class Trigger extends Model
     ];
 
     protected $casts = [
-        'operator' => ComparisonOperator::class,
+        'operator' => Operator::class,
         'type' => TriggerType::class,
     ];
 

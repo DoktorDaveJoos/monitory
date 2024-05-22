@@ -3,7 +3,7 @@
 namespace App\Actions;
 
 use App\DTOs\MonitorPassableDTO;
-use App\Enums\ComparisonOperator;
+use App\Enums\Operator;
 use App\Enums\TriggerType;
 use App\Models\Check;
 use App\Models\Trigger;
@@ -60,15 +60,20 @@ class PerformCheckValidation
         };
     }
 
-    protected static function compare($value, $operator, $checkValue): bool
+    protected static function compare($checkValue, $operator, $value): bool
     {
+
+        if ($operator === Operator::GREATER_THAN) {
+            dump($checkValue > $value);
+        }
+
         return match ($operator) {
-            ComparisonOperator::EQUALS => $value === $checkValue,
-            ComparisonOperator::NOT_EQUALS => $value !== $checkValue,
-            ComparisonOperator::GREATER_THAN => $value > $checkValue,
-            ComparisonOperator::LESS_THAN => $value < $checkValue,
-            ComparisonOperator::GREATER_THAN_OR_EQUALS => $value >= $checkValue,
-            ComparisonOperator::LESS_THAN_OR_EQUALS => $value <= $checkValue,
+            Operator::EQUALS => $checkValue === $value,
+            Operator::NOT_EQUALS => $checkValue !== $value,
+            Operator::GREATER_THAN => $checkValue > $value,
+            Operator::LESS_THAN => $checkValue < $value,
+            Operator::GREATER_THAN_OR_EQUALS => $checkValue >= $value,
+            Operator::LESS_THAN_OR_EQUALS => $checkValue <= $value,
             default => false,
         };
     }

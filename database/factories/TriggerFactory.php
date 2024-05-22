@@ -2,7 +2,7 @@
 
 namespace Database\Factories;
 
-use App\Enums\ComparisonOperator;
+use App\Enums\Operator;
 use App\Enums\TriggerType;
 use App\Models\Monitor;
 use App\Models\Trigger;
@@ -24,7 +24,7 @@ class TriggerFactory extends Factory
             'monitor_id' => Monitor::factory()->create(),
             'type' => TriggerType::HTTP_STATUS_CODE,
             'value' => 500,
-            'comparison_operator' => ComparisonOperator::GREATER_THAN,
+            'operator' => Operator::GREATER_THAN,
         ];
     }
 }

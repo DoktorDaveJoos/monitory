@@ -2,7 +2,7 @@
 
 namespace App\Enums;
 
-enum ComparisonOperator: string
+enum Operator: string
 {
     case EQUALS = 'equals';
     case NOT_EQUALS = 'not_equals';

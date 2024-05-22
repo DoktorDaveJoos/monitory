@@ -1,16 +1,20 @@
 <?php
 
-namespace Tests\Unit;
+namespace Tests\Feature;
 
 use App\Actions\PerformCheckAction;
 use App\DTOs\MonitorPassableDTO;
 use App\Models\Monitor;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 class PerformCheckActionTest extends TestCase
 {
+
+    use RefreshDatabase;
+
     public function test_check_is_returned(): void
     {
         Http::fake();

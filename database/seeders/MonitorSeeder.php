@@ -2,13 +2,12 @@
 
 namespace Database\Seeders;
 
-use App\Enums\ComparisonOperator;
+use App\Enums\Operator;
 use App\Enums\TriggerType;
 use App\Models\Monitor;
 use App\Models\Trigger;
 use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Http;
 use Symfony\Component\HttpFoundation\Response;
 
 class MonitorSeeder extends Seeder
@@ -25,10 +24,9 @@ class MonitorSeeder extends Seeder
                     ->state([
                         'type' => TriggerType::HTTP_STATUS_CODE,
                         'value' => 500,
-                        'comparison_operator' => ComparisonOperator::GREATER_THAN,
+                        'operator' => Operator::GREATER_THAN,
                     ])
-                    ->create()
-            );
+            )->create();
     }
 
     public static function runFor(User $user, int $count = 1): void
@@ -41,9 +39,8 @@ class MonitorSeeder extends Seeder
                     ->state([
                         'type' => TriggerType::HTTP_STATUS_CODE,
                         'value' => Response::HTTP_OK,
-                        'comparison_operator' => ComparisonOperator::NOT_EQUALS,
+                        'operator' => Operator::NOT_EQUALS,
                     ])
-                    ->create()
-            );
+            )->create();
     }
 }

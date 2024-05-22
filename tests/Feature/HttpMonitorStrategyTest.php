@@ -58,7 +58,6 @@ class HttpMonitorStrategyTest extends TestCase
         $monitor = Monitor::factory()->create([
             'type' => ActionType::HTTP,
             'url' => self::URL,
-            'expected_status_code' => $status,
         ]);
 
         $strategy = HttpMonitorStrategy::make(

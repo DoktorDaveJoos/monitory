@@ -22,15 +22,11 @@ return new class extends Migration
             $table->string('type');
 
             $table->string('url');
-            $table->integer('expected_status_code');
 
             $table->integer('frequency')->default(5);
             $table->boolean('active')->default(true);
 
             $table->string('method')->nullable();
-            $table->integer('timeout')->nullable();
-            $table->integer('connection_timeout')->nullable();
-
             $table->timestamp('last_checked_at')->nullable();
 
             // Create indices

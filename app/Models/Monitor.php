@@ -15,9 +15,7 @@ use Illuminate\Support\Collection;
  * @property string name
  * @property ActionType type
  * @property string url
- * @property int expected_status_code
  * @property int frequency
- * @property int timeout
  * @property bool active
  * @property string last_checked_at
  * @property User user

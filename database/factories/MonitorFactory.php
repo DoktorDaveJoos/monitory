@@ -25,10 +25,8 @@ class MonitorFactory extends Factory
             'name' => $this->faker->name,
             'type' => ActionType::HTTP,
             'url' => $this->faker->url,
-            'expected_status_code' => 200,
             'method' => HttpMethod::GET,
             'frequency' => 5,
-            'timeout' => 60,
             'active' => true,
             'last_checked_at' => now(),
         ];

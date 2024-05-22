@@ -19,7 +19,6 @@ class HttpMonitorStrategy implements MonitorStrategy
         public int $monitor_id,
         public string $url,
         public HttpMethod $method,
-        public string $expectedStatusCode,
     ) {
     }
 
@@ -86,7 +85,6 @@ class HttpMonitorStrategy implements MonitorStrategy
             monitor_id: $attributes['id'],
             url: $attributes['url'],
             method: HttpMethod::tryFrom($attributes['method']),
-            expectedStatusCode: $attributes['expected_status_code'],
         );
     }
 }
