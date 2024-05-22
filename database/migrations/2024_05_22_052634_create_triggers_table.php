@@ -19,7 +19,7 @@ return new class extends Migration
                 ->onDelete('cascade');
 
             $table->string('type');
-            $table->string('operator', 2);
+            $table->string('operator');
             $table->integer('value');
 
             $table->timestamps();

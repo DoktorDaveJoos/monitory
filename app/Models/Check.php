@@ -30,5 +30,4 @@ class Check extends Model
     {
         return $this->belongsTo(Monitor::class);
     }
-
 }

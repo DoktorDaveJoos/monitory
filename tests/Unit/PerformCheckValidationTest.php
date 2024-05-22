@@ -6,11 +6,8 @@ use PHPUnit\Framework\TestCase;
 
 class PerformCheckValidationTest extends TestCase
 {
-    /**
-     * A basic unit test example.
-     */
-    public function test_example(): void
+    public function test_trigger_alert_is_sent_when_check_fails(): void
     {
-        $this->assertTrue(true);
+
     }
 }

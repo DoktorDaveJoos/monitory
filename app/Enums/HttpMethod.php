@@ -2,9 +2,6 @@
 
 namespace App\Enums;
 
-use App\Actions\MonitorStrategies\HttpMonitorStrategy;
-use App\Actions\MonitorStrategies\MonitorStrategy;
-
 enum HttpMethod: string
 {
     case GET = 'GET';

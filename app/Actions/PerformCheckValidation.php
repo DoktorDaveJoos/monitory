@@ -3,6 +3,8 @@
 namespace App\Actions;
 
 use App\DTOs\MonitorPassableDTO;
+use App\Enums\ComparisonOperator;
+use App\Enums\TriggerType;
 use App\Models\Check;
 use App\Models\Trigger;
 use App\Notifications\TriggerAlert;
@@ -39,13 +41,12 @@ class PerformCheckValidation
                     $monitorPassableDTO->monitor->user,
                     new TriggerAlert(
                         monitorName: $monitorPassableDTO->monitor->name,
-                        triggerName: $trigger->type,
-                        reason: self::getReason($trigger)
+                        triggerName: $trigger->type->getLabel(),
+                        reason: $trigger->type->getLabel().' '.$trigger->operator->getLabel().' '.$trigger->value.' triggered.'
                     )
                 );
             }
         });
-
 
         return $next($monitorPassableDTO);
     }
@@ -53,30 +54,21 @@ class PerformCheckValidation
     protected static function evaluateTrigger(Trigger $trigger, Check $check): bool
     {
         return match ($trigger->type) {
-            'status' => self::compare($check->status_code, $trigger->operator, $trigger->value),
-            'response_time' => self::compare($check->response_time, $trigger->operator, $trigger->value),
+            TriggerType::HTTP_STATUS_CODE => self::compare($check->status_code, $trigger->operator, $trigger->value),
+            TriggerType::LATENCY => self::compare($check->response_time, $trigger->operator, $trigger->value),
             default => false,
-        };
-    }
-
-    protected static function getReason(Trigger $trigger): string
-    {
-        return match ($trigger->type) {
-            'status' => 'Status code '.$trigger->operator.' '.$trigger->value,
-            'response_time' => 'Response time '.$trigger->operator.' '.$trigger->value,
-            default => '',
         };
     }
 
     protected static function compare($value, $operator, $checkValue): bool
     {
         return match ($operator) {
-            '=' => $value === $checkValue,
-            '!=' => $value !== $checkValue,
-            '>' => $value > $checkValue,
-            '<' => $value < $checkValue,
-            '>=' => $value >= $checkValue,
-            '<=' => $value <= $checkValue,
+            ComparisonOperator::EQUALS => $value === $checkValue,
+            ComparisonOperator::NOT_EQUALS => $value !== $checkValue,
+            ComparisonOperator::GREATER_THAN => $value > $checkValue,
+            ComparisonOperator::LESS_THAN => $value < $checkValue,
+            ComparisonOperator::GREATER_THAN_OR_EQUALS => $value >= $checkValue,
+            ComparisonOperator::LESS_THAN_OR_EQUALS => $value <= $checkValue,
             default => false,
         };
     }

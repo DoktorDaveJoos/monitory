@@ -15,5 +15,4 @@ enum ActionType: string
             self::HTTP => HttpMonitorStrategy::make($attributes),
         };
     }
-
 }

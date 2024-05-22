@@ -4,7 +4,6 @@ namespace App\Policies;
 
 use App\Models\Monitor;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class MonitorPolicy
 {

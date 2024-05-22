@@ -9,5 +9,4 @@ interface MonitorStrategy
     public function check(): Check;
 
     public static function make(array $attributes): MonitorStrategy;
-
 }

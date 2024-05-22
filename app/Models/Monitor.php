@@ -70,5 +70,4 @@ class Monitor extends Model
     {
         return $this->hasMany(Trigger::class);
     }
-
 }

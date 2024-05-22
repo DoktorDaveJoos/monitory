@@ -17,7 +17,7 @@ class PerformCheckAction
      */
     public function handle(MonitorPassableDTO $monitorPassableDTO, Closure $next)
     {
-        Log::debug( 'Performing action for monitor', [
+        Log::debug('Performing action for monitor', [
             'monitor_id' => $monitorPassableDTO->monitor->id,
             'monitor_type' => $monitorPassableDTO->monitor->type->value,
         ]);

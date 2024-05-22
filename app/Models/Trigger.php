@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\ComparisonOperator;
+use App\Enums\TriggerType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -9,9 +11,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 /**
  * @property int id
  * @property int monitor_id
- * @property string type
- * @property string operator
- * @property string value
+ * @property TriggerType type
+ * @property ComparisonOperator operator
+ * @property int value
  */
 class Trigger extends Model
 {
@@ -24,9 +26,13 @@ class Trigger extends Model
         'value',
     ];
 
+    protected $casts = [
+        'operator' => ComparisonOperator::class,
+        'type' => TriggerType::class,
+    ];
+
     public function monitor(): BelongsTo
     {
         return $this->belongsTo(Monitor::class);
     }
-
 }

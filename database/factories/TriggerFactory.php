@@ -2,10 +2,14 @@
 
 namespace Database\Factories;
 
+use App\Enums\ComparisonOperator;
+use App\Enums\TriggerType;
+use App\Models\Monitor;
+use App\Models\Trigger;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Trigger>
+ * @extends Factory<Trigger>
  */
 class TriggerFactory extends Factory
 {
@@ -17,7 +21,10 @@ class TriggerFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'monitor_id' => Monitor::factory()->create(),
+            'type' => TriggerType::HTTP_STATUS_CODE,
+            'value' => 500,
+            'comparison_operator' => ComparisonOperator::GREATER_THAN,
         ];
     }
 }
