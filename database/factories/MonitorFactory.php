@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Enums\ActionType;
 use App\Enums\HttpMethod;
 use App\Models\Monitor;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -20,6 +21,7 @@ class MonitorFactory extends Factory
     public function definition(): array
     {
         return [
+            'user_id' => User::factory()->create(),
             'name' => $this->faker->name,
             'type' => ActionType::HTTP,
             'url' => $this->faker->url,

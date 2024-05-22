@@ -89,13 +89,4 @@ class HttpMonitorStrategy implements MonitorStrategy
             expectedStatusCode: $attributes['expected_status_code'],
         );
     }
-
-    public function validate(): void
-    {
-
-        $monitor = Monitor::find($this->monitor_id);
-
-
-
-    }
 }
