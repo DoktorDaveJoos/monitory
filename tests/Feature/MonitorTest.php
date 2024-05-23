@@ -10,6 +10,7 @@ use App\Enums\TriggerType;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia;
+use Mockery;
 use PHPUnit\Framework\Attributes\Before;
 use Symfony\Component\HttpFoundation\Response;
 use Tests\TestCase;
@@ -28,11 +29,11 @@ class MonitorTest extends TestCase
         $this->user = User::factory()->create();
     }
 
-    public function setUserSubscribed(): void
+    public function actingAsSubscribedUser(User $user): void
     {
-        $this->partialMock(User::class, function ($mock) {
-            $mock->shouldReceive('subscribed')->andReturn(true);
-        });
+        $this->user = Mockery::mock($user)->makePartial();
+        $this->user->shouldReceive('subscribed')->andReturn(true);
+        $this->actingAs($this->user);
     }
 
     public function test_user_can_view_monitor(): void
@@ -309,9 +310,7 @@ class MonitorTest extends TestCase
 
     public function test_user_with_subscription_can_set_interval_to_1_minute()
     {
-        $this->setUserSubscribed();
-
-        $this->actingAs($this->user);
+        $this->actingAsSubscribedUser($this->user);
 
         $response = $this->post('/monitors', [
             'name' => 'My Monitor',
@@ -345,14 +344,12 @@ class MonitorTest extends TestCase
             'interval' => Interval::MINUTES_1->value,
         ]);
 
-        $response->assertSessionHasErrors('subscription');
+        $response->assertSessionHasErrors('interval');
     }
 
     public function test_user_with_subscription_can_create_more_than_3_monitors()
     {
-        $this->setUserSubscribed();
-
-        $this->actingAs($this->user);
+        $this->actingAsSubscribedUser($this->user);
 
         $this->user->monitors()->createMany([[
             'name' => 'Monitor 1',
@@ -426,8 +423,6 @@ class MonitorTest extends TestCase
             'interval' => Interval::MINUTES_5->value,
         ]);
 
-        // Check why its not subscribed in IntervalLimit rule
-
-        $response->assertSessionHasErrors('subscription');
+        $response->assertForbidden();
     }
 }

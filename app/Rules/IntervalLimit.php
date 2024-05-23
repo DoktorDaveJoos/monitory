@@ -21,8 +21,6 @@ class IntervalLimit implements ValidationRule
         // Check if the user has a subscription
         // If not set interval to 'in:5' instead of 'in:1,5'
         if ($user->subscribed()) {
-            dump('User has a subscription');
-
             return;
         }
 
