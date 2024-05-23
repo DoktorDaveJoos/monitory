@@ -26,7 +26,7 @@ class MonitorFactory extends Factory
             'type' => ActionType::HTTP,
             'url' => $this->faker->url,
             'method' => HttpMethod::GET,
-            'frequency' => 5,
+            'interval' => 5,
             'active' => true,
             'last_checked_at' => now(),
         ];

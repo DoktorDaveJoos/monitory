@@ -29,14 +29,15 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
-        $subscription = $request->user()?->subscription();
 
         return [
             ...parent::share($request),
             'auth' => [
                 'user' => $request->user(),
             ],
-            'paymentMethodUrl' => $subscription?->updatePaymentMethodUrl(),
+            'paymentMethodUrl' => $request->user()
+                ?->subscription()
+                ?->updatePaymentMethodUrl(),
         ];
     }
 }

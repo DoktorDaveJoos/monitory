@@ -14,7 +14,7 @@ class Check extends Model
         'monitor_id',
         'status_code',
         'response_time',
-        'response_content',
+        'response_body',
         'response_headers',
         'started_at',
         'finished_at',
@@ -22,6 +22,8 @@ class Check extends Model
     ];
 
     protected $casts = [
+        'response_headers' => 'array',
+        'response_time' => 'integer',
         'started_at' => 'datetime',
         'finished_at' => 'datetime',
     ];

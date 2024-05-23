@@ -12,7 +12,7 @@ class ScheduleChecks extends Command
      *
      * @var string
      */
-    protected $signature = 'monitory:schedule-checks {frequency=5}';
+    protected $signature = 'monitory:schedule-checks {interval=5}';
 
     /**
      * The console command description.
@@ -30,7 +30,7 @@ class ScheduleChecks extends Command
         $monitors = DB::table('monitors')
             ->select('id')
             ->where('active', true)
-            ->where('frequency', $this->argument('frequency'))
+            ->where('interval', $this->argument('interval'))
             ->get();
 
         $monitors->each(function ($monitor) {

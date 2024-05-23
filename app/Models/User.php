@@ -13,6 +13,9 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable, Billable;
 
+    public const MAX_MONITORS = 3;
+    public const MAX_MONITORS_WITH_SUBSCRIPTION = 25;
+
     /**
      * The attributes that are mass assignable.
      *

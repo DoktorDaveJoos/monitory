@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\ActionType;
 use App\Enums\HttpMethod;
+use App\Enums\Interval;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -12,10 +13,11 @@ use Illuminate\Support\Collection;
 
 /**
  * @property int id
+ * @property int user_id
  * @property string name
  * @property ActionType type
  * @property string url
- * @property int frequency
+ * @property int interval
  * @property bool active
  * @property string last_checked_at
  * @property User user
@@ -27,6 +29,7 @@ class Monitor extends Model
     use HasFactory;
 
     protected $hidden = [
+        'user_id',
         'created_at',
         'updated_at',
     ];
@@ -36,9 +39,10 @@ class Monitor extends Model
         'type',
         'url',
         'expected_status_code',
-        'frequency',
+        'interval',
         'timeout',
         'active',
+        'method',
         'last_checked_at',
     ];
 
@@ -47,6 +51,7 @@ class Monitor extends Model
         'method' => HttpMethod::class,
         'active' => 'boolean',
         'last_checked_at' => 'datetime',
+        'interval' => Interval::class
     ];
 
     public function scopeActive($query)

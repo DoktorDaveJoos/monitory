@@ -23,14 +23,14 @@ return new class extends Migration
 
             $table->string('url');
 
-            $table->integer('frequency')->default(5);
+            $table->integer('interval')->default(5);
             $table->boolean('active')->default(true);
 
             $table->string('method')->nullable();
             $table->timestamp('last_checked_at')->nullable();
 
             // Create indices
-            $table->index('frequency');
+            $table->index('interval');
 
             $table->timestamps();
         });
