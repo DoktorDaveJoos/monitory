@@ -36,11 +36,13 @@ class PerformCheck implements ShouldQueue
             monitor: Monitor::find($this->monitorId)
         );
 
-        $result = Pipeline::send($passable)->through([
-            PerformCheckAction::class,
-            PerformCheckValidation::class,
-            PerformCheckNotification::class,
-        ])->thenReturn();
+        $result = Pipeline::send($passable)
+            ->through([
+                PerformCheckAction::class,
+                PerformCheckValidation::class,
+                PerformCheckNotification::class,
+            ])
+            ->thenReturn();
 
         Log::debug('Check performed', [
             'monitor_id' => $this->monitorId,

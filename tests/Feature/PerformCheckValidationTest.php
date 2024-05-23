@@ -12,12 +12,10 @@ use App\Enums\TriggerType;
 use App\Models\Check;
 use App\Models\Monitor;
 use App\Models\Trigger;
-use App\Notifications\TriggerAlert;
 use Database\Factories\CheckFactory;
 use Database\Factories\TriggerFactory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Notification;
 use PHPUnit\Framework\Attributes\DataProvider;
 use ReflectionClass;
 use ReflectionException;
@@ -28,9 +26,8 @@ class PerformCheckValidationTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_trigger_alert_is_sent_when_check_fails(): void
+    public function test_alert_is_triggered_when_check_fails(): void
     {
-        Notification::fake();
         Http::fake(
             fn ($request) => Http::response(['status' => 'error'], Response::HTTP_INTERNAL_SERVER_ERROR)
         );
@@ -48,13 +45,15 @@ class PerformCheckValidationTest extends TestCase
                 'method' => HttpMethod::GET,
             ]);
 
-        PerformCheckAction::run(
+        $result = PerformCheckAction::run(
             monitorPassableDTO: MonitorPassableDTO::make($monitor),
-            next: fn ($dto) => PerformCheckValidation::run(
+            next: fn (MonitorPassableDTO $dto) => PerformCheckValidation::run(
                 monitorPassableDTO: $dto,
-                next: fn ($dto) => $dto
+                next: fn (MonitorPassableDTO $dto) => $dto
             )
         );
+
+        $this->assertTrue($result->failed());
 
         $this->assertDatabaseHas('checks', [
             'monitor_id' => $monitor->id,
@@ -62,16 +61,10 @@ class PerformCheckValidationTest extends TestCase
         ]);
 
         Http::assertSentCount(1);
-
-        Notification::assertSentTo(
-            notifiable: [$monitor->user],
-            notification: TriggerAlert::class
-        );
     }
 
-    public function test_trigger_alert_is_not_sent_when_check_passes(): void
+    public function test_alert_is_not_triggered_when_check_passes(): void
     {
-        Notification::fake();
         Http::fake([
             '*' => Http::response(['status' => 'ok'], Response::HTTP_OK),
         ]);
@@ -89,13 +82,15 @@ class PerformCheckValidationTest extends TestCase
                 'method' => HttpMethod::GET,
             ]);
 
-        PerformCheckAction::run(
+        $result = PerformCheckAction::run(
             monitorPassableDTO: MonitorPassableDTO::make($monitor),
-            next: fn ($dto) => PerformCheckValidation::run(
+            next: fn (MonitorPassableDTO $dto) => PerformCheckValidation::run(
                 monitorPassableDTO: $dto,
-                next: fn ($dto) => $dto
+                next: fn (MonitorPassableDTO $dto) => $dto
             )
         );
+
+        $this->assertFalse($result->failed());
 
         $this->assertDatabaseHas('checks', [
             'monitor_id' => $monitor->id,
@@ -103,8 +98,6 @@ class PerformCheckValidationTest extends TestCase
         ]);
 
         Http::assertSentCount(1);
-
-        Notification::assertNothingSent();
     }
 
     /**

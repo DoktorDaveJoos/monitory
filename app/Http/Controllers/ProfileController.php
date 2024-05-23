@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
 use Inertia\Response;
+use LemonSqueezy\Laravel\Checkout;
 
 class ProfileController extends Controller
 {
@@ -59,5 +60,13 @@ class ProfileController extends Controller
         $request->session()->regenerateToken();
 
         return Redirect::to('/');
+    }
+
+    /**
+     * Subscribe the user to a plan.
+     */
+    public function subscribe(Request $request): Checkout
+    {
+        return $request->user()->subscribe('389126');
     }
 }

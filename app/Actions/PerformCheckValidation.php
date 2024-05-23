@@ -28,7 +28,7 @@ class PerformCheckValidation
             'monitor_type' => $monitorPassableDTO->monitor->type->value,
         ]);
 
-        $monitorPassableDTO->monitor->triggers->each(function (Trigger $trigger) use ($monitorPassableDTO) {
+        $monitorPassableDTO->monitor->triggers->each(function (Trigger $trigger) use (&$monitorPassableDTO) {
             if (self::evaluateTrigger($trigger, $monitorPassableDTO->getCheck())) {
 
                 Log::debug('Trigger matched', [
@@ -36,13 +36,14 @@ class PerformCheckValidation
                     'trigger_id' => $trigger->id,
                 ]);
 
-                // Notify the user
-                Notification::send(
-                    $monitorPassableDTO->monitor->user,
-                    new TriggerAlert(
-                        monitorName: $monitorPassableDTO->monitor->name,
-                        triggerName: $trigger->type->getLabel(),
-                        reason: $trigger->type->getLabel().' '.$trigger->operator->getLabel().' '.$trigger->value.' triggered.'
+                $monitorPassableDTO->fail();
+
+                $monitorPassableDTO->addReason(
+                    sprintf(
+                        '%s %s %s triggered.',
+                        $trigger->type->getLabel(),
+                        $trigger->operator->getLabel(),
+                        $trigger->value
                     )
                 );
             }

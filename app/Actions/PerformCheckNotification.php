@@ -3,8 +3,10 @@
 namespace App\Actions;
 
 use App\DTOs\MonitorPassableDTO;
+use App\Notifications\TriggerAlert;
 use Closure;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Notification;
 use Lorisleiva\Actions\Concerns\AsAction;
 use Throwable;
 
@@ -22,7 +24,15 @@ class PerformCheckNotification
             'monitor_type' => $monitorPassableDTO->monitor->type->value,
         ]);
 
-        // If the check failed, we should notify the user
+        if ($monitorPassableDTO->failed()) {
+            Notification::send(
+                $monitorPassableDTO->monitor->user,
+                new TriggerAlert(
+                    monitorName: $monitorPassableDTO->monitor->name,
+                    reasons: $monitorPassableDTO->getReasons(),
+                )
+            );
+        }
 
         return $next($monitorPassableDTO);
     }

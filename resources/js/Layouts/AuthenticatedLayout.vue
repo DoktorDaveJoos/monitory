@@ -8,6 +8,16 @@ import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
 import { Link } from '@inertiajs/vue3';
 
 const showingNavigationDropdown = ref(false);
+
+import { usePage } from '@inertiajs/vue3'
+
+const page = usePage();
+
+const paymentMethodUrl = page.props.paymentMethodUrl;
+
+function updatePM() {
+    window.LemonSqueezy.Url.Open(paymentMethodUrl);
+}
 </script>
 
 <template>
@@ -32,6 +42,9 @@ const showingNavigationDropdown = ref(false);
                                 <NavLink :href="route('dashboard')" :active="route().current('dashboard')">
                                     Dashboard
                                 </NavLink>
+                                <button v-if="paymentMethodUrl" @click="updatePM">
+                                    Billing
+                                </button>
                             </div>
                         </div>
 
@@ -115,6 +128,9 @@ const showingNavigationDropdown = ref(false);
                         <ResponsiveNavLink :href="route('dashboard')" :active="route().current('dashboard')">
                             Dashboard
                         </ResponsiveNavLink>
+                        <button @click="updatePM">
+                            Billing
+                        </button>
                     </div>
 
                     <!-- Responsive Settings Options -->

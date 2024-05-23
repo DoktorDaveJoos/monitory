@@ -8,6 +8,7 @@ use App\Models\Monitor;
 class MonitorPassableDTO
 {
     private bool $failed = false;
+    private array $reasons = [];
 
     private Check $check;
 
@@ -28,7 +29,7 @@ class MonitorPassableDTO
         $this->failed = true;
     }
 
-    public function hasFailed(): bool
+    public function failed(): bool
     {
         return $this->failed;
     }
@@ -41,5 +42,15 @@ class MonitorPassableDTO
     public function getCheck(): Check
     {
         return $this->check;
+    }
+
+    public function addReason(string $reason): void
+    {
+        $this->reasons[] = $reason;
+    }
+
+    public function getReasons(): array
+    {
+        return $this->reasons;
     }
 }

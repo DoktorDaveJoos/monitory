@@ -15,8 +15,7 @@ class TriggerAlert extends Notification
      */
     public function __construct(
         readonly string $monitorName,
-        readonly string $triggerName,
-        readonly string $reason,
+        readonly array $reasons,
     ) {
     }
 
@@ -35,11 +34,14 @@ class TriggerAlert extends Notification
      */
     public function toMail(object $notifiable): MailMessage
     {
-        return (new MailMessage)
-            ->line('A trigger has been activated for monitor: '.$this->monitorName)
-            ->line('Trigger: '.$this->triggerName)
-            ->line('Reason: '.json_encode($this->reason))
-            ->line('Thank you for using our application!');
+        $message = (new MailMessage)
+            ->line('A trigger has been activated for monitor: '.$this->monitorName);
+
+        foreach ($this->reasons as $index => $reason) {
+            $message->line('Reason '.($index + 1).': '.$reason);
+        }
+
+        return $message->line('Thank you for using our application!');
     }
 
     /**
