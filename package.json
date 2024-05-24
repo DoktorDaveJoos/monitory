@@ -1,20 +1,31 @@
 {
-    "private": true,
-    "type": "module",
-    "scripts": {
-        "dev": "vite",
-        "build": "vite build"
-    },
-    "devDependencies": {
-        "@inertiajs/vue3": "^1.0.0",
-        "@tailwindcss/forms": "^0.5.3",
-        "@vitejs/plugin-vue": "^5.0.0",
-        "autoprefixer": "^10.4.12",
-        "axios": "^1.6.4",
-        "laravel-vite-plugin": "^1.0",
-        "postcss": "^8.4.31",
-        "tailwindcss": "^3.2.1",
-        "vite": "^5.0",
-        "vue": "^3.4.0"
-    }
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
+  },
+  "devDependencies": {
+    "@chromatic-com/storybook": "^1.4.0",
+    "@inertiajs/vue3": "^1.0.0",
+    "@storybook/addon-essentials": "^8.1.3",
+    "@storybook/addon-interactions": "^8.1.3",
+    "@storybook/addon-links": "^8.1.3",
+    "@storybook/blocks": "^8.1.3",
+    "@storybook/test": "^8.1.3",
+    "@storybook/vue3": "^8.1.3",
+    "@storybook/vue3-vite": "^8.1.3",
+    "@tailwindcss/forms": "^0.5.3",
+    "@vitejs/plugin-vue": "^5.0.0",
+    "autoprefixer": "^10.4.12",
+    "axios": "^1.6.4",
+    "laravel-vite-plugin": "^1.0",
+    "postcss": "^8.4.31",
+    "storybook": "^8.1.3",
+    "tailwindcss": "^3.2.1",
+    "vite": "^5.0",
+    "vue": "^3.4.0"
+  }
 }

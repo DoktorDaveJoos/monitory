@@ -183,7 +183,7 @@ class PerformCheckValidationTest extends TestCase
                     'status_code' => Response::HTTP_NOT_FOUND,
                 ]),
             ],
-            'latency < 500, given 250>' => [
+            'latency < 500, given 250' => [
                 Trigger::factory()->state([
                     'type' => TriggerType::LATENCY,
                     'operator' => Operator::GREATER_THAN,
