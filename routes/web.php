@@ -3,6 +3,7 @@
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MonitorController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\TriggerController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -27,10 +28,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/subscribe', [ProfileController::class, 'subscribe'])->name('subscribe');
 
-    Route::post('/monitors', [MonitorController::class, 'store'])->name('monitor.store');
-    Route::get('/monitors/{monitor}', [MonitorController::class, 'show'])->name('monitor.show');
-    Route::put('/monitors/{monitor}', [MonitorController::class, 'update'])->name('monitor.update');
-    Route::delete('/monitors/{monitor}', [MonitorController::class, 'destroy'])->name('monitor.destroy');
+    Route::post('/monitor', [MonitorController::class, 'store'])->name('monitor.store');
+    Route::get('/monitor/{monitor}', [MonitorController::class, 'show'])->name('monitor.show');
+    Route::put('/monitor/{monitor}', [MonitorController::class, 'update'])->name('monitor.update');
+    Route::delete('/monitor/{monitor}', [MonitorController::class, 'destroy'])->name('monitor.destroy');
+
+    Route::post('/monitor/{monitor}/trigger', [TriggerController::class, 'store'])->name('trigger.store');
+    Route::delete('/monitor/{monitor}/trigger/{trigger}', [TriggerController::class, 'destroy'])->name('trigger.destroy');
+
 });
 
 require __DIR__.'/auth.php';

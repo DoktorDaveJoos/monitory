@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Models\Monitor;
 use App\Models\Trigger;
 use App\Models\User;
 
@@ -12,7 +13,7 @@ class TriggerPolicy
      */
     public function viewAny(User $user): bool
     {
-        //
+        return false;
     }
 
     /**
@@ -20,15 +21,19 @@ class TriggerPolicy
      */
     public function view(User $user, Trigger $trigger): bool
     {
-        //
+        return $user->id === $trigger->monitor->user_id;
     }
 
     /**
      * Determine whether the user can create models.
      */
-    public function create(User $user): bool
+    public function create(User $user, Monitor $monitor): bool
     {
-        //
+        $maxTriggers = $user->subscribed()
+            ? User::MAX_TRIGGERS_PER_MONITOR_WITH_SUBSCRIPTION
+            : User::MAX_TRIGGERS_PER_MONITOR;
+
+        return $monitor->triggers->count() < $maxTriggers;
     }
 
     /**
@@ -36,7 +41,7 @@ class TriggerPolicy
      */
     public function update(User $user, Trigger $trigger): bool
     {
-        //
+        return false;
     }
 
     /**
@@ -44,7 +49,7 @@ class TriggerPolicy
      */
     public function delete(User $user, Trigger $trigger): bool
     {
-        //
+        return $user->id === $trigger->monitor->user_id;
     }
 
     /**
@@ -52,7 +57,7 @@ class TriggerPolicy
      */
     public function restore(User $user, Trigger $trigger): bool
     {
-        //
+        return false;
     }
 
     /**
@@ -60,6 +65,6 @@ class TriggerPolicy
      */
     public function forceDelete(User $user, Trigger $trigger): bool
     {
-        //
+        return false;
     }
 }

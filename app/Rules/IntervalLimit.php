@@ -19,11 +19,11 @@ class IntervalLimit implements ValidationRule
         $user = request()->user();
 
         // Check if the user has a subscription
-        // If not set interval to 'in:5' instead of 'in:1,5'
         if ($user->subscribed()) {
             return;
         }
 
+        // If the user has no subscription, only 5 minutes intervals are allowed
         if ($value == Interval::MINUTES_1->value) {
             $fail("The $attribute must be 5. You can only set 1 minute intervals with a subscription.");
         }

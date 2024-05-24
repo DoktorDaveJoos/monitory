@@ -33,6 +33,8 @@ return new class extends Migration
             $table->index('interval');
 
             $table->timestamps();
+
+            $table->softDeletes();
         });
     }
 

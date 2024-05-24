@@ -10,7 +10,6 @@ use App\Enums\TriggerType;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia;
-use Mockery;
 use PHPUnit\Framework\Attributes\Before;
 use Symfony\Component\HttpFoundation\Response;
 use Tests\TestCase;
@@ -29,13 +28,6 @@ class MonitorTest extends TestCase
         $this->user = User::factory()->create();
     }
 
-    public function actingAsSubscribedUser(User $user): void
-    {
-        $this->user = Mockery::mock($user)->makePartial();
-        $this->user->shouldReceive('subscribed')->andReturn(true);
-        $this->actingAs($this->user);
-    }
-
     public function test_user_can_view_monitor(): void
     {
         $this->actingAs($this->user);
@@ -48,7 +40,7 @@ class MonitorTest extends TestCase
             'interval' => Interval::MINUTES_5,
         ]);
 
-        $response = $this->get("/monitors/$monitor->id");
+        $response = $this->get("/monitor/$monitor->id");
 
         $response
             ->assertInertia(fn (AssertableInertia $page) => $page
@@ -95,7 +87,7 @@ class MonitorTest extends TestCase
             'finished_at' => now(),
         ]);
 
-        $response = $this->get("/monitors/$monitor->id");
+        $response = $this->get("/monitor/$monitor->id");
 
         $response
             ->assertInertia(fn (AssertableInertia $page) => $page
@@ -150,7 +142,7 @@ class MonitorTest extends TestCase
         $from = now()->subHour()->format('Y-m-d H:i:s');
         $to = now()->subMinutes(30)->format('Y-m-d H:i:s');
 
-        $this->get("/monitors/$monitor->id?from=$from&to=$to")
+        $this->get("/monitor/$monitor->id?from=$from&to=$to")
             ->assertInertia(fn (AssertableInertia $page) => $page
                 ->component('Monitor/Show')
                 ->has('checks', 0)
@@ -200,7 +192,7 @@ class MonitorTest extends TestCase
         $from = now()->subHour()->format('Y-m-d H:i:s');
         $to = now()->subSecond()->format('Y-m-d H:i:s');
 
-        $this->get("/monitors/$monitor->id?from=$from&to=$to")
+        $this->get("/monitor/$monitor->id?from=$from&to=$to")
             ->assertInertia(fn (AssertableInertia $page) => $page
                 ->component('Monitor/Show')
                 ->has('checks', 2)
@@ -222,7 +214,7 @@ class MonitorTest extends TestCase
         $from = now()->subHours(10)->format('Y-m-d H:i:s');
         $to = now()->subSecond()->format('Y-m-d H:i:s');
 
-        $this->get("/monitors/$monitor->id?from=$from&to=$to")
+        $this->get("/monitor/$monitor->id?from=$from&to=$to")
             ->assertSessionHasErrors(['from', 'to']);
     }
 
@@ -230,7 +222,7 @@ class MonitorTest extends TestCase
     {
         $this->actingAs($this->user);
 
-        $response = $this->post('/monitors', [
+        $response = $this->post('/monitor', [
             'name' => 'My Monitor',
             'type' => ActionType::HTTP->value,
             'url' => self::URL,
@@ -262,7 +254,7 @@ class MonitorTest extends TestCase
             'interval' => Interval::MINUTES_5,
         ]);
 
-        $response = $this->put("/monitors/$monitor->id", [
+        $response = $this->put("/monitor/$monitor->id", [
             'name' => 'Updated Monitor',
             'type' => ActionType::HTTP->value,
             'url' => self::URL,
@@ -294,25 +286,19 @@ class MonitorTest extends TestCase
             'interval' => Interval::MINUTES_5,
         ]);
 
-        $response = $this->delete("/monitors/$monitor->id");
+        $response = $this->delete("/monitor/$monitor->id");
 
         // Inertia redirects to the monitors index page
-        $response->assertStatus(302);
+        $response->assertRedirect(route('dashboard'));
 
-        $this->assertDatabaseMissing('monitors', [
-            'name' => 'My Monitor',
-            'type' => ActionType::HTTP,
-            'url' => self::URL,
-            'method' => HttpMethod::GET,
-            'interval' => Interval::MINUTES_5,
-        ]);
+        $this->assertSoftDeleted($monitor);
     }
 
     public function test_user_with_subscription_can_set_interval_to_1_minute()
     {
         $this->actingAsSubscribedUser($this->user);
 
-        $response = $this->post('/monitors', [
+        $response = $this->post('/monitor', [
             'name' => 'My Monitor',
             'type' => ActionType::HTTP->value,
             'url' => self::URL,
@@ -336,7 +322,7 @@ class MonitorTest extends TestCase
     {
         $this->actingAs($this->user);
 
-        $response = $this->post('/monitors', [
+        $response = $this->post('/monitor', [
             'name' => 'My Monitor',
             'type' => ActionType::HTTP->value,
             'url' => self::URL,
@@ -371,7 +357,7 @@ class MonitorTest extends TestCase
             'interval' => Interval::MINUTES_5,
         ]]);
 
-        $response = $this->post('/monitors', [
+        $response = $this->post('/monitor', [
             'name' => 'Monitor 4',
             'type' => ActionType::HTTP->value,
             'url' => self::URL,
@@ -415,13 +401,30 @@ class MonitorTest extends TestCase
             'interval' => Interval::MINUTES_5,
         ]]);
 
-        $response = $this->post('/monitors', [
+        $response = $this->post('/monitor', [
             'name' => 'Monitor 4',
             'type' => ActionType::HTTP->value,
             'url' => self::URL,
             'method' => HttpMethod::GET->value,
             'interval' => Interval::MINUTES_5->value,
         ]);
+
+        $response->assertForbidden();
+    }
+
+    public function test_user_cannot_view_monitor_they_do_not_own(): void
+    {
+        $monitor = User::factory()->create()->monitors()->create([
+            'name' => 'My Monitor',
+            'type' => ActionType::HTTP,
+            'url' => self::URL,
+            'method' => HttpMethod::GET,
+            'interval' => Interval::MINUTES_5,
+        ]);
+
+        $this->actingAs($this->user);
+
+        $response = $this->get("/monitor/$monitor->id");
 
         $response->assertForbidden();
     }

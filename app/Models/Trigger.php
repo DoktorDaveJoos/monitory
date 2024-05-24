@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 /**
  * @property int id
  * @property int monitor_id
+ * @property Monitor monitor
  * @property TriggerType type
  * @property Operator operator
  * @property int value
