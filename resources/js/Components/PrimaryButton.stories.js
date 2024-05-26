@@ -11,7 +11,22 @@ export default {
  * See https://storybook.js.org/docs/api/csf
  * to learn how to use render functions.
  */
-export const Primary = {
+export const Basic = {
+    render: (args) => ({
+        components: { PrimaryButton, Plus },
+        setup() {
+            return { args };
+        },
+        template: '<PrimaryButton>' +
+            'ADD MONITOR' +
+            '</PrimaryButton>',
+    }),
+    args: {
+        //👇 The args you need here will depend on your component
+    },
+};
+
+export const WithIcon = {
     render: (args) => ({
         components: { PrimaryButton, Plus },
         setup() {
@@ -26,3 +41,19 @@ export const Primary = {
         //👇 The args you need here will depend on your component
     },
 };
+
+export const Disabled = {
+    render: (args) => ({
+        components: { PrimaryButton, Plus },
+        setup() {
+            return { args };
+        },
+        template: '<PrimaryButton disabled>' +
+            'ADD MONITOR' +
+            '</PrimaryButton>',
+    }),
+    args: {
+        //👇 The args you need here will depend on your component
+    },
+};
+

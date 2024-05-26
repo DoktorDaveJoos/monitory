@@ -4,7 +4,6 @@
     >
         <slot />
 
-
         <slot name="icon" />
     </button>
 </template>
