@@ -9,7 +9,7 @@ import { Link } from '@inertiajs/vue3';
 
 const showingNavigationDropdown = ref(false);
 
-import { usePage } from '@inertiajs/vue3'
+import { usePage } from '@inertiajs/vue3';
 
 const page = usePage();
 
@@ -31,9 +31,7 @@ function updatePM() {
                             <!-- Logo -->
                             <div class="shrink-0 flex items-center">
                                 <Link :href="route('dashboard')">
-                                    <ApplicationLogo
-                                        class="block h-9 w-auto fill-current text-gray-800"
-                                    />
+                                    <ApplicationLogo class="block h-9 w-auto fill-current text-gray-800" />
                                 </Link>
                             </div>
 
@@ -42,9 +40,7 @@ function updatePM() {
                                 <NavLink :href="route('dashboard')" :active="route().current('dashboard')">
                                     Dashboard
                                 </NavLink>
-                                <button v-if="paymentMethodUrl" @click="updatePM">
-                                    Billing
-                                </button>
+                                <button v-if="paymentMethodUrl" @click="updatePM">Billing</button>
                             </div>
                         </div>
 
@@ -128,9 +124,7 @@ function updatePM() {
                         <ResponsiveNavLink :href="route('dashboard')" :active="route().current('dashboard')">
                             Dashboard
                         </ResponsiveNavLink>
-                        <button @click="updatePM">
-                            Billing
-                        </button>
+                        <button @click="updatePM">Billing</button>
                     </div>
 
                     <!-- Responsive Settings Options -->

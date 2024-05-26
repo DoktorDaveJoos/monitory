@@ -52,9 +52,7 @@ const closeModal = () => {
 
         <Modal :show="confirmingUserDeletion" @close="closeModal">
             <div class="p-6">
-                <h2 class="text-lg font-medium text-gray-900">
-                    Are you sure you want to delete your account?
-                </h2>
+                <h2 class="text-lg font-medium text-gray-900">Are you sure you want to delete your account?</h2>
 
                 <p class="mt-1 text-sm text-gray-600">
                     Once your account is deleted, all of its resources and data will be permanently deleted. Please

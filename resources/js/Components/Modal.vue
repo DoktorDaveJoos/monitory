@@ -26,7 +26,7 @@ watch(
         } else {
             document.body.style.overflow = null;
         }
-    }
+    },
 );
 
 const close = () => {

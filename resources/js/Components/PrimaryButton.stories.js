@@ -17,9 +17,7 @@ export const Basic = {
         setup() {
             return { args };
         },
-        template: '<PrimaryButton>' +
-            'ADD MONITOR' +
-            '</PrimaryButton>',
+        template: '<PrimaryButton>' + 'ADD MONITOR' + '</PrimaryButton>',
     }),
     args: {
         //👇 The args you need here will depend on your component
@@ -32,7 +30,8 @@ export const WithIcon = {
         setup() {
             return { args };
         },
-        template: '<PrimaryButton>' +
+        template:
+            '<PrimaryButton>' +
             'ADD MONITOR' +
             '<template #icon><Plus class="h-4 w-4" /></template>' +
             '</PrimaryButton>',
@@ -48,12 +47,9 @@ export const Disabled = {
         setup() {
             return { args };
         },
-        template: '<PrimaryButton disabled>' +
-            'ADD MONITOR' +
-            '</PrimaryButton>',
+        template: '<PrimaryButton disabled>' + 'ADD MONITOR' + '</PrimaryButton>',
     }),
     args: {
         //👇 The args you need here will depend on your component
     },
 };
-

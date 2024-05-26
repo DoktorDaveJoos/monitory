@@ -1,12 +1,11 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import {Head} from '@inertiajs/vue3';
-import PrimaryButton from "@/Components/PrimaryButton.vue";
-
+import { Head } from '@inertiajs/vue3';
+import PrimaryButton from '@/Components/PrimaryButton.vue';
 </script>
 
 <template>
-    <Head title="Dashboard"/>
+    <Head title="Dashboard" />
 
     <AuthenticatedLayout>
         <template #header>
@@ -20,11 +19,8 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
                         You're logged in!
 
                         <a href="/subscribe">
-                            <PrimaryButton>
-                                Subscribe
-                            </PrimaryButton>
+                            <PrimaryButton> Subscribe </PrimaryButton>
                         </a>
-
                     </div>
                 </div>
             </div>
