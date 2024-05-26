@@ -47,7 +47,8 @@ export const Disabled = {
         setup() {
             return { args };
         },
-        template: '<PrimaryButton disabled>' + 'ADD MONITOR' + '</PrimaryButton>',
+        template:
+            '<PrimaryButton disabled>' + 'ADD MONITOR' + '</PrimaryButton>',
     }),
     args: {
         //👇 The args you need here will depend on your component
