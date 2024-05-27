@@ -1,9 +1,9 @@
-import PrimaryButton from './PrimaryButton.vue';
-import { Plus } from 'lucide-vue-next';
+import DangerButton from './DangerButton.vue';
+import { Trash2 } from 'lucide-vue-next';
 
 //👇 This default export determines where your story goes in the story list
 export default {
-    component: PrimaryButton,
+    component: DangerButton,
 };
 
 /*
@@ -13,11 +13,11 @@ export default {
  */
 export const Basic = {
     render: (args) => ({
-        components: { PrimaryButton, Plus },
+        components: { DangerButton },
         setup() {
             return { args };
         },
-        template: '<PrimaryButton>' + 'ADD MONITOR' + '</PrimaryButton>',
+        template: '<DangerButton>' + 'delete' + '</DangerButton>',
     }),
     args: {
         //👇 The args you need here will depend on your component
@@ -26,15 +26,15 @@ export const Basic = {
 
 export const WithIcon = {
     render: (args) => ({
-        components: { PrimaryButton, Plus },
+        components: { DangerButton, Trash2 },
         setup() {
             return { args };
         },
         template:
-            '<PrimaryButton>' +
-            'ADD MONITOR' +
-            '<template #icon><Plus class="ml-1 h-4 w-4" /></template>' +
-            '</PrimaryButton>',
+            '<DangerButton>' +
+            'Delete' +
+            '<template #icon><Trash2 class="ml-1 h-4 w-4" /></template>' +
+            '</DangerButton>',
     }),
     args: {
         //👇 The args you need here will depend on your component

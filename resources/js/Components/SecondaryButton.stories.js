@@ -1,9 +1,9 @@
-import PrimaryButton from './PrimaryButton.vue';
-import { Plus } from 'lucide-vue-next';
+import SecondaryButton from './SecondaryButton.vue';
+import { ChevronDown } from 'lucide-vue-next';
 
 //👇 This default export determines where your story goes in the story list
 export default {
-    component: PrimaryButton,
+    component: SecondaryButton,
 };
 
 /*
@@ -13,11 +13,11 @@ export default {
  */
 export const Basic = {
     render: (args) => ({
-        components: { PrimaryButton, Plus },
+        components: { SecondaryButton },
         setup() {
             return { args };
         },
-        template: '<PrimaryButton>' + 'ADD MONITOR' + '</PrimaryButton>',
+        template: '<SecondaryButton>' + 'go back' + '</SecondaryButton>',
     }),
     args: {
         //👇 The args you need here will depend on your component
@@ -26,15 +26,15 @@ export const Basic = {
 
 export const WithIcon = {
     render: (args) => ({
-        components: { PrimaryButton, Plus },
+        components: { SecondaryButton, ChevronDown },
         setup() {
             return { args };
         },
         template:
-            '<PrimaryButton>' +
-            'ADD MONITOR' +
-            '<template #icon><Plus class="ml-1 h-4 w-4" /></template>' +
-            '</PrimaryButton>',
+            '<SecondaryButton>' +
+            'see more' +
+            '<template #icon><ChevronDown class="ml-1 h-4 w-4" /></template>' +
+            '</SecondaryButton>',
     }),
     args: {
         //👇 The args you need here will depend on your component
