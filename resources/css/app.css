@@ -6,6 +6,8 @@
 
 @layer base {
     :root {
+
+        --background-dark: 250 18% 13%;
         --background: 215 28% 17%;
         --foreground: 252 87% 94%;
 

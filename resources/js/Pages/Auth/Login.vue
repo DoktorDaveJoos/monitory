@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import Checkbox from '@/Components/Checkbox.vue';
+import { Checkbox } from '@/Components/ui/checkbox';
 import GuestLayout from '@/Layouts/GuestLayout.vue';
 import InputError from '@/Components/InputError.vue';
-import InputLabel from '@/Components/InputLabel.vue';
-import PrimaryButton from '@/Components/PrimaryButton.vue';
-import TextInput from '@/Components/TextInput.vue';
+import { Input } from '@/Components/ui/input';
 import { Head, Link, useForm } from '@inertiajs/vue3';
+import { Label } from '@/Components/ui/label';
+import { Card } from '@/Components/ui/card';
+import { Button } from '@/Components/ui/button';
 
 defineProps<{
     canResetPassword?: boolean;
@@ -35,58 +36,63 @@ const submit = () => {
             {{ status }}
         </div>
 
-        <form @submit.prevent="submit">
-            <div>
-                <InputLabel for="email" value="Email" />
+        <Card class="py-4 px-6 w-full max-w-md">
+            <form @submit.prevent="submit">
+                <div>
+                    <Label for="email">Email</Label>
 
-                <TextInput
-                    id="email"
-                    type="email"
-                    class="mt-1 block w-full"
-                    v-model="form.email"
-                    required
-                    autofocus
-                    autocomplete="username"
-                />
+                    <Input
+                        id="email"
+                        type="email"
+                        v-model="form.email"
+                        class="mt-1"
+                        required
+                        autofocus
+                        autocomplete="username"
+                    />
 
-                <InputError class="mt-2" :message="form.errors.email" />
-            </div>
+                    <InputError class="mt-2" :message="form.errors.email" />
+                </div>
 
-            <div class="mt-4">
-                <InputLabel for="password" value="Password" />
+                <div class="mt-4">
+                    <Label for="password">Password</Label>
 
-                <TextInput
-                    id="password"
-                    type="password"
-                    class="mt-1 block w-full"
-                    v-model="form.password"
-                    required
-                    autocomplete="current-password"
-                />
+                    <Input
+                        id="password"
+                        type="password"
+                        class="mt-1"
+                        v-model="form.password"
+                        required
+                        autocomplete="current-password"
+                    />
 
-                <InputError class="mt-2" :message="form.errors.password" />
-            </div>
+                    <InputError class="mt-2" :message="form.errors.password" />
+                </div>
 
-            <div class="block mt-4">
-                <label class="flex items-center">
-                    <Checkbox name="remember" v-model:checked="form.remember" />
-                    <span class="ms-2 text-sm text-gray-600 dark:text-gray-400">Remember me</span>
-                </label>
-            </div>
+                <div class="flex items-center space-x-2 mt-4">
+                    <Checkbox id="terms" v-model:checked="form.remember" />
+                    <label
+                        for="terms"
+                        class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    >
+                        Remember me
+                    </label>
+                </div>
 
-            <div class="flex items-center justify-end mt-4">
-                <Link
-                    v-if="canResetPassword"
-                    :href="route('password.request')"
-                    class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800"
-                >
-                    Forgot your password?
-                </Link>
+                <div class="flex items-center justify-end mt-4">
+                    <Link
+                        v-if="canResetPassword"
+                        :href="route('password.request')"
+                        class="underline text-sm text-foreground/80 dark:text-gray-400 hover:text-foreground dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800"
+                    >
+                        Forgot your password?
+                    </Link>
 
-                <PrimaryButton class="ms-4" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
-                    Log in
-                </PrimaryButton>
-            </div>
-        </form>
+                    <Button class="ms-4" :disabled="form.processing">
+                        Log in
+                    </Button>
+                </div>
+            </form>
+        </Card>
     </GuestLayout>
 </template>
