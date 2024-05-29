@@ -49,7 +49,7 @@ class MonitorController extends Controller
         ]);
 
         // Default to the last hour
-        if (!$request->has('from') && !$request->has('to')) {
+        if (! $request->has('from') && ! $request->has('to')) {
             $to = Carbon::now();
             $from = $to->copy()->subHour();
         } else {

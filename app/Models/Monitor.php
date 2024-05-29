@@ -5,6 +5,8 @@ namespace App\Models;
 use App\Enums\ActionType;
 use App\Enums\HttpMethod;
 use App\Enums\Interval;
+use App\Models\Scopes\MonitorScope;
+use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -25,6 +27,7 @@ use Illuminate\Support\Collection;
  * @property Collection<Check> checks
  * @property Collection<Trigger> triggers
  */
+#[ScopedBy([MonitorScope::class])]
 class Monitor extends Model
 {
     use HasFactory, SoftDeletes;
@@ -52,7 +55,7 @@ class Monitor extends Model
         'method' => HttpMethod::class,
         'active' => 'boolean',
         'last_checked_at' => 'datetime',
-        'interval' => Interval::class
+        'interval' => Interval::class,
     ];
 
     public function scopeActive($query)

@@ -24,6 +24,8 @@ return new class extends Migration
             $table->text('response_headers')->nullable();
             $table->text('response_body')->nullable();
 
+            $table->boolean('success')->default(false);
+
             $table->timestamp('started_at');
             $table->timestamp('finished_at');
 

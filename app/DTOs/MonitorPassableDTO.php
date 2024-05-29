@@ -8,6 +8,7 @@ use App\Models\Monitor;
 class MonitorPassableDTO
 {
     private bool $failed = false;
+
     private array $reasons = [];
 
     private Check $check;

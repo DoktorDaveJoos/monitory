@@ -12,7 +12,6 @@ use Tests\TestCase;
 
 class PerformCheckActionTest extends TestCase
 {
-
     use RefreshDatabase;
 
     public function test_check_is_returned(): void

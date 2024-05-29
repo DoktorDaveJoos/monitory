@@ -5,7 +5,21 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
+/**
+ * @property int id
+ * @property int monitor_id
+ * @property int status_code
+ * @property int response_time
+ * @property array response_body
+ * @property array response_headers
+ * @property bool success
+ * @property Carbon started_at
+ * @property Carbon finished_at
+ * @property Carbon created_at
+ * @property Monitor monitor
+ */
 class Check extends Model
 {
     use HasFactory;

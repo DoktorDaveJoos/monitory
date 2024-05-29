@@ -2,6 +2,8 @@
 
 namespace App\Http\Middleware;
 
+use App\Http\Resources\MonitorListItemResource;
+use App\Models\Monitor;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -17,7 +19,7 @@ class HandleInertiaRequests extends Middleware
     /**
      * Determine the current asset version.
      */
-    public function version(Request $request): string|null
+    public function version(Request $request): ?string
     {
         return parent::version($request);
     }
@@ -34,7 +36,13 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
-            'appVersion' => config('app.version')
+            'app' => [
+                'name' => config('app.name'),
+                'version' => config('app.version'),
+            ],
+            'monitor_list' => MonitorListItemResource::collection(
+                Monitor::active()->get()
+            ),
         ];
     }
 }

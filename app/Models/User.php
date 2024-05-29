@@ -11,11 +11,14 @@ use LemonSqueezy\Laravel\Billable;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, Billable;
+    use Billable, HasFactory, Notifiable;
 
     public const MAX_MONITORS = 3;
+
     public const MAX_MONITORS_WITH_SUBSCRIPTION = 25;
+
     public const MAX_TRIGGERS_PER_MONITOR = 1;
+
     public const MAX_TRIGGERS_PER_MONITOR_WITH_SUBSCRIPTION = 5;
 
     /**

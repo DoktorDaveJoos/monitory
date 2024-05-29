@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
+import { usePage } from '@inertiajs/vue3';
 import { cn } from '@/utils';
 import { TooltipProvider } from 'radix-vue';
 import {
@@ -9,31 +10,15 @@ import {
 } from '@/Components/ui/resizable';
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 import NavLink from '@/Components/ui/navlink/NavLink.vue';
-import { Home, Settings } from 'lucide-vue-next';
+import { Home, LogOut, Monitor, MonitorOff, Settings } from 'lucide-vue-next';
+import { Label } from '@/Components/ui/label';
+import { MonitorLink } from '@/Components/ui/monitorlink';
 
-const showingNavigationDropdown = ref(false);
+const collapsed = ref(false);
 
-interface LayoutProps {
-    defaultLayout?: number[];
-    defaultCollapsed?: boolean;
-    navCollapsedSize?: number;
-}
-
-const props = withDefaults(defineProps<LayoutProps>(), {
-    defaultCollapsed: false,
-    navCollapsedSize: 0,
-    defaultLayout: () => [20, 80],
+const hasMonitors = computed(() => {
+    return usePage().props.monitor_list.data.length > 0;
 });
-
-const isCollapsed = ref(props.defaultCollapsed);
-
-function onCollapse() {
-    isCollapsed.value = true;
-}
-
-function onExpand() {
-    isCollapsed.value = false;
-}
 </script>
 
 <template>
@@ -180,53 +165,101 @@ function onExpand() {
         <ResizablePanelGroup
             id="resize-panel-group"
             direction="horizontal"
-            class="min-h-screen items-stretch"
+            class="min-h-screen max-h-screen items-stretch"
+            auto-save-id="auto-save-id"
         >
             <ResizablePanel
-                id="resize-panel-1"
-                :default-size="defaultLayout[0]"
-                :collapsed-size="navCollapsedSize"
                 collapsible
+                id="resize-panel-1"
+                :collapsed-size="0"
                 :min-size="10"
-                :max-size="20"
+                :max-size="25"
                 :class="
                     cn(
-                        'p-4',
-                        isCollapsed &&
-                            'min-w-[60px] transition-all duration-300 ease-in-out px-2',
+                        'p-4 flex flex-col',
+                        collapsed &&
+                            'min-w-[60px] transition-all duration-150 ease-in-out px-2',
                     )
                 "
-                @expand="onExpand"
-                @collapse="onCollapse"
+                @collapse="collapsed = true"
+                @expand="collapsed = false"
             >
-                <ApplicationLogo :collapsed="isCollapsed" />
-                <div class="mt-16 space-y-3">
-                    <NavLink
-                        :collapsed="isCollapsed"
-                        :href="route('dashboard')"
-                        :active="route().current('dashboard')"
-                        :icon="Home"
-                        label="Dashboard"
-                    >
-                    </NavLink>
-                    <NavLink
-                        :collapsed="isCollapsed"
-                        :href="route('profile.edit')"
-                        :active="route().current('profile*')"
-                        :icon="Settings"
-                        label="Settings"
-                    >
-                    </NavLink>
-                </div>
+                <template v-slot:default="{ isCollapsed }">
+                    <ApplicationLogo :collapsed="isCollapsed" />
+                    <div class="flex flex-col flex-1">
+                        <div class="mt-16 space-y-3">
+                            <NavLink
+                                :collapsed="isCollapsed"
+                                :href="route('dashboard')"
+                                :active="route().current('dashboard')"
+                                :icon="Home"
+                                label="Dashboard"
+                            >
+                            </NavLink>
+                            <NavLink
+                                :collapsed="isCollapsed"
+                                :href="route('profile.edit')"
+                                :active="route().current('profile*')"
+                                :icon="Settings"
+                                label="Settings"
+                            >
+                            </NavLink>
+                        </div>
+                        <div
+                            class="mt-16 space-y-3 flex-1"
+                            :class="isCollapsed && 'text-center'"
+                        >
+                            <Label class="inline-flex items-center">
+                                <Component
+                                    :is="hasMonitors ? Monitor : MonitorOff"
+                                    class="w-4 h-4"
+                                    :class="!isCollapsed && 'mr-2'"
+                                />
+                                <span v-if="!isCollapsed" class="truncate"
+                                    >Monitors</span
+                                >
+                            </Label>
+                            <template v-if="!hasMonitors">
+                                <div
+                                    v-if="!isCollapsed"
+                                    class="truncate text-xs italic"
+                                >
+                                    No monitors yet.
+                                </div>
+                            </template>
+                            <template v-else>
+                                <MonitorLink
+                                    v-for="monitor in $page.props.monitor_list
+                                        .data"
+                                    :key="monitor.id"
+                                    :collapsed="isCollapsed"
+                                    :monitor-list-item="monitor"
+                                >
+                                </MonitorLink>
+                            </template>
+                        </div>
+                        <NavLink
+                            method="post"
+                            as="button"
+                            :icon="LogOut"
+                            :href="route('logout')"
+                            label="Logout"
+                        />
+                    </div>
+                </template>
             </ResizablePanel>
             <ResizableHandle id="resize-handle-1" />
             <ResizablePanel
                 id="resize-panel-2"
-                :default-size="defaultLayout[1]"
-                :min-size="30"
-                class="bg-background-dark px-4 sm:px-8 lg:px-12 py-4"
+                :default-size="collapsed ? 100 : 75"
+                :min-size="75"
+                class="bg-background-dark"
             >
-                <slot />
+                <div
+                    class="flex flex-col px-4 sm:px-8 lg:px-12 py-4 h-full overflow-y-scroll"
+                >
+                    <slot />
+                </div>
             </ResizablePanel>
         </ResizablePanelGroup>
     </TooltipProvider>

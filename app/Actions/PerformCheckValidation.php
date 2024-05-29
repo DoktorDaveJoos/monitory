@@ -7,10 +7,8 @@ use App\Enums\Operator;
 use App\Enums\TriggerType;
 use App\Models\Check;
 use App\Models\Trigger;
-use App\Notifications\TriggerAlert;
 use Closure;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Notification;
 use Lorisleiva\Actions\Concerns\AsAction;
 use Throwable;
 

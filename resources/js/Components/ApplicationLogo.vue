@@ -1,12 +1,18 @@
 <template>
-    <div class="flex flex-col items-center space-y-2">
+    <div class="flex flex-col items-center h-20">
         <img src="/img/logo.svg" alt="monitory.io" class="h-8" />
-        <span
+        <div
             v-if="!collapsed"
-            class="text-sm font-mono font-medium text-primary-foreground/50 leading-tight"
+            class="text-sm mt-2 font-mono truncate font-medium text-primary-foreground/50 leading-tight"
         >
-            monitory {{ $page.props.appVersion }}
-        </span>
+            monitory
+        </div>
+        <div
+            v-if="!collapsed"
+            class="font-mono truncate text-xs font-medium text-primary-foreground/50 leading-tight"
+        >
+            {{ $page.props.app.version }}
+        </div>
     </div>
 </template>
 <script setup lang="ts">

@@ -2,9 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Actions\PerformCheckAction;
 use App\Actions\PerformCheckNotification;
-use App\Actions\PerformCheckValidation;
 use App\DTOs\MonitorPassableDTO;
 use App\Enums\ActionType;
 use App\Enums\HttpMethod;
@@ -14,9 +12,7 @@ use App\Models\Monitor;
 use App\Models\Trigger;
 use App\Notifications\TriggerAlert;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Notification;
-use Illuminate\Support\Facades\Pipeline;
 use Symfony\Component\HttpFoundation\Response;
 use Tests\TestCase;
 

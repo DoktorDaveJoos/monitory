@@ -8,7 +8,6 @@ use Mockery;
 
 abstract class TestCase extends BaseTestCase
 {
-
     protected mixed $user;
 
     public function actingAsSubscribedUser(User $user): void
