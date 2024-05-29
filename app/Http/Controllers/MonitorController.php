@@ -6,6 +6,7 @@ use App\Actions\StoreMonitor;
 use App\Actions\UpdateMonitor;
 use App\Http\Requests\StoreMonitorRequest;
 use App\Http\Requests\UpdateMonitorRequest;
+use App\Http\Resources\CheckResource;
 use App\Models\Check;
 use App\Models\Monitor;
 use App\Rules\CheckDateRange;
@@ -59,10 +60,13 @@ class MonitorController extends Controller
 
         return inertia('Monitor/Show', [
             'monitor' => $monitor->load(['triggers']),
-            'checks' => Check::whereBelongsTo($monitor)
-                ->whereBetween('created_at', [$from, $to])
-                ->orderBy('created_at', 'desc')
-                ->get(),
+            'check_labels' => Check::labels($from, $to),
+            'checks' => CheckResource::collection(
+                Check::whereBelongsTo($monitor)
+                    ->whereBetween('created_at', [$from, $to])
+                    ->orderBy('created_at')
+                    ->get()
+            ),
         ]);
     }
 

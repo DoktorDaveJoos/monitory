@@ -42,6 +42,18 @@ class Check extends Model
         'finished_at' => 'datetime',
     ];
 
+    public static function labels(Carbon $from, Carbon $to): array
+    {
+        $labels = [];
+        $from = $from->copy();
+        while ($from->lte($to)) {
+            $labels[] = $from->format('Y-m-d H:i');
+            $from->addMinute();
+        }
+
+        return $labels;
+    }
+
     public function monitor(): BelongsTo
     {
         return $this->belongsTo(Monitor::class);

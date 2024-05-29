@@ -11,6 +11,6 @@ class CheckSeeder extends Seeder
      */
     public function run(): void
     {
-        //
+
     }
 }

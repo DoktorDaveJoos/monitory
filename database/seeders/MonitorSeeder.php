@@ -4,10 +4,13 @@ namespace Database\Seeders;
 
 use App\Enums\Operator;
 use App\Enums\TriggerType;
+use App\Models\Check;
 use App\Models\Monitor;
 use App\Models\Trigger;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Carbon;
 use Symfony\Component\HttpFoundation\Response;
 
 class MonitorSeeder extends Seeder
@@ -31,6 +34,9 @@ class MonitorSeeder extends Seeder
 
     public static function runFor(User $user, int $count = 1): void
     {
+        // Time series for the checks
+        $startTime = Carbon::now()->subMinutes(60);
+
         // With one trigger that says: if the HTTP status code is not the expected one, trigger an alert
         Monitor::factory($count)
             ->for($user)
@@ -41,6 +47,21 @@ class MonitorSeeder extends Seeder
                         'value' => Response::HTTP_OK,
                         'operator' => Operator::NOT_EQUALS,
                     ])
-            )->create();
+            )
+            ->has(
+                Check::factory()
+                    ->count(60)
+                    ->state(new Sequence(
+                        ...array_map(
+                            fn($i) => [
+                                'created_at' => $startTime->copy()->addMinutes($i),
+                                'updated_at' => $startTime->copy()->addMinutes($i),
+                                'started_at' => $startTime->copy()->addMinutes($i),
+                            ],
+                            range(0, 59)
+                        )
+                    ))
+            )
+            ->create();
     }
 }

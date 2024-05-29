@@ -147,13 +147,6 @@ const hasMonitors = computed(() => {
     <!--                </div>-->
     <!--            </nav>-->
 
-    <!--            &lt;!&ndash; Page Heading &ndash;&gt;-->
-    <!--            <header class="bg-white dark:bg-gray-800 shadow" v-if="$slots.header">-->
-    <!--                <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">-->
-    <!--                    <slot name="header" />-->
-    <!--                </div>-->
-    <!--            </header>-->
-
     <!--            &lt;!&ndash; Page Content &ndash;&gt;-->
     <!--            <main>-->
     <!--                <slot />-->
@@ -256,8 +249,19 @@ const hasMonitors = computed(() => {
                 class="bg-background-dark"
             >
                 <div
-                    class="flex flex-col px-4 sm:px-8 lg:px-12 py-4 h-full overflow-y-scroll"
+                    class="flex flex-col px-4 sm:px-8 lg:px-12 py-4 h-full overflow-y-auto"
                 >
+                    <!-- Page Heading -->
+                    <header v-if="$slots.header">
+                        <div
+                            class="max-w-7xl mx-auto pt-6 pb-10 flex justify-between"
+                        >
+                            <slot name="header" />
+                            <slot name="center" />
+                            <slot name="actions" />
+                        </div>
+                    </header>
+
                     <slot />
                 </div>
             </ResizablePanel>
