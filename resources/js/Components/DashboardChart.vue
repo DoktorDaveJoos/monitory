@@ -4,11 +4,11 @@ import { Monitor } from '@/types';
 import { Card } from '@/Components/ui/card';
 import { Chart } from '@/Components/ui/chart';
 import { BellOff, Edit, Trash2 } from 'lucide-vue-next';
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipTrigger,
-} from '@/Components/ui/tooltip';
+// import {
+//     Tooltip,
+//     TooltipContent,
+//     TooltipTrigger,
+// } from '@/Components/ui/tooltip';
 import {
     Dialog,
     DialogContent,
@@ -23,6 +23,7 @@ import { Input } from '@/Components/ui/input';
 import InputError from '@/Components/InputError.vue';
 import { Button } from '@/Components/ui/button';
 import { ref, watch } from 'vue';
+import { useToast } from '@/Components/ui/toast';
 
 const props = defineProps<{
     monitor: Monitor;
@@ -42,6 +43,11 @@ const deleteMonitor = () => {
     useForm({}).delete(route('monitor.destroy', props.monitor.id), {
         onSuccess: () => {
             confirmingMonitorDeletion.value = false;
+            useToast().toast({
+                title: 'Deleted',
+                description: 'Your monitor has been deleted.',
+                variant: 'destructive',
+            });
         },
     });
 };

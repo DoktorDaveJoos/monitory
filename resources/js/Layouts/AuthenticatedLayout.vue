@@ -13,6 +13,7 @@ import NavLink from '@/Components/ui/navlink/NavLink.vue';
 import { Home, LogOut, Monitor, MonitorOff, Settings } from 'lucide-vue-next';
 import { Label } from '@/Components/ui/label';
 import { MonitorLink } from '@/Components/ui/monitorlink';
+import Toaster from '@/Components/ui/toast/Toaster.vue';
 
 const collapsed = ref(false);
 
@@ -267,4 +268,5 @@ const hasMonitors = computed(() => {
             </ResizablePanel>
         </ResizablePanelGroup>
     </TooltipProvider>
+    <Toaster />
 </template>
