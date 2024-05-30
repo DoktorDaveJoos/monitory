@@ -1,13 +1,21 @@
 <script setup lang="ts">
 import Chart from 'chart.js/auto';
 
-import { tryOnMounted, useDateFormat } from '@vueuse/core';
+import {
+    tryOnMounted,
+    useDateFormat,
+    useResizeObserver,
+    watchDebounced,
+} from '@vueuse/core';
 import { Check, ResourceCollection } from '@/types';
-import { fillMissingChecks, isMultipleOfTenMinutes } from '@/utils';
+import { cn, fillMissingChecks, isMultipleOfTenMinutes } from '@/utils';
+import { ref } from 'vue';
 
 export interface ChartOptions {
     fading?: boolean;
+    size?: 'small' | 'large';
     show_x_ticks?: boolean;
+    show_grid?: boolean;
 }
 
 const props = withDefaults(
@@ -21,6 +29,7 @@ const props = withDefaults(
             return {
                 fading: false,
                 show_x_ticks: true,
+                show_grid: true,
             };
         },
     },
@@ -36,8 +45,30 @@ Chart.defaults.backgroundColor = 'rgba(59, 237, 195, 1)';
 Chart.defaults.borderColor = 'rgba(232, 227, 253, .05)';
 Chart.defaults.color = 'rgba(232, 227, 253, .5)';
 
+const chartParent = ref(null);
+const chartParentWidth = ref(0);
+
+useResizeObserver(chartParent, (entries) => {
+    const entry = entries[0];
+    const { width } = entry.contentRect;
+
+    chartParentWidth.value = width;
+});
+
+watchDebounced(
+    chartParentWidth,
+    () => {
+        if (myChart.value) {
+            myChart.value.resize();
+        }
+    },
+    { debounce: 100 },
+);
+
 const getRed = (opacity: number) => `rgba(255, 107, 107, ${opacity})`;
 const getGreen = (opacity: number) => `rgba(59, 237, 195, ${opacity})`;
+
+const myChart = ref<Chart<'bar', number[], string> | null>(null);
 
 // Make this robust by checking if the element exists
 tryOnMounted(() => {
@@ -47,7 +78,7 @@ tryOnMounted(() => {
         throw new Error('Could not find canvas element');
     }
 
-    new Chart(ctx, {
+    myChart.value = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: props.check_labels,
@@ -75,8 +106,11 @@ tryOnMounted(() => {
                         display: false,
                         offset: false,
                     },
+                    border: {
+                        display: false,
+                    },
                     ticks: {
-                        callback: function (tickValue, index) {
+                        callback: function (_, index) {
                             if (!props.options.show_x_ticks) return null;
 
                             const value = props.check_labels[index];
@@ -95,11 +129,16 @@ tryOnMounted(() => {
                         display: false,
                         stepSize: 250,
                     },
+                    grid: {
+                        display: props.options.show_grid,
+                    },
+                    border: {
+                        display: false,
+                    },
                 },
             },
             elements: {
                 bar: {
-                    backgroundColor: '#3BEDC3',
                     borderRadius: 10,
                     borderSkipped: false,
                 },
@@ -115,5 +154,15 @@ tryOnMounted(() => {
 </script>
 
 <template>
-    <canvas class="max-h-20 inset-0" id="myChart"></canvas>
+    <div ref="chartParent" class="relative">
+        <canvas
+            :class="
+                cn(
+                    options.size === 'large' && 'max-h-32',
+                    options.size === 'small' && 'max-h-20',
+                )
+            "
+            id="myChart"
+        ></canvas>
+    </div>
 </template>

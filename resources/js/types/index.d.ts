@@ -24,6 +24,7 @@ export interface Monitor {
     interval: number;
     active: boolean;
     method: string;
+    uptime: string;
     last_checked_at: string;
     checks: Array<Check>;
 }

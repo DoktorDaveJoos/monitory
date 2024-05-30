@@ -5,6 +5,7 @@ namespace App\Http\Resources;
 use App\Models\Monitor;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Number;
 
 /**
  * @mixin Monitor
@@ -29,6 +30,14 @@ class MonitorResource extends JsonResource
             'active' => $this->active,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+            'uptime' => $this->checks()->count() > 0
+                ? Number::percentage(
+                    number: $this->checks()
+                        ->where('success', true)
+                        ->count() / $this->checks()->count() * 100,
+                    precision: 2
+                )
+                : 0,
             'checks' => CheckResource::collection(
                 $this->checks()
                     ->where('started_at', '>=', now()->subHour())
