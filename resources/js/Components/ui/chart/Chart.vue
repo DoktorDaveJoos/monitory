@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import Chart from 'chart.js/auto';
-
 import {
     tryOnMounted,
     useDateFormat,
@@ -65,8 +64,10 @@ watchDebounced(
     { debounce: 100 },
 );
 
-const getRed = (opacity: number) => `rgba(255, 107, 107, ${opacity})`;
-const getGreen = (opacity: number) => `rgba(59, 237, 195, ${opacity})`;
+const getRed = (opacity: number, fading: boolean) =>
+    fading ? `rgba(255, 107, 107, ${opacity})` : 'rgba(255, 107, 107, 1)';
+const getGreen = (opacity: number, fading: boolean) =>
+    fading ? `rgba(59, 237, 195, ${opacity})` : `rgba(59, 237, 195, 1)`;
 
 const myChart = ref<Chart<'bar', number[], string> | null>(null);
 
@@ -89,8 +90,14 @@ tryOnMounted(() => {
                     borderWidth: 1,
                     backgroundColor: checks.map((check, index: number) =>
                         check.success
-                            ? getGreen((checks.length + index) / 100)
-                            : getRed((checks.length + index) / 100),
+                            ? getGreen(
+                                  (checks.length + index) / 100,
+                                  props.options.fading ?? false,
+                              )
+                            : getRed(
+                                  (checks.length + index) / 100,
+                                  props.options.fading ?? false,
+                              ),
                     ),
                     barThickness: 7,
                 },
