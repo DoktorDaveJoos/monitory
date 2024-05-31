@@ -3,7 +3,7 @@ import { Link, useForm } from '@inertiajs/vue3';
 import { Monitor } from '@/types';
 import { Card } from '@/Components/ui/card';
 import { Chart } from '@/Components/ui/chart';
-import { BellOff, Edit, Trash2 } from 'lucide-vue-next';
+import { BellOff, Edit, PlugZap, Trash2 } from 'lucide-vue-next';
 // import {
 //     Tooltip,
 //     TooltipContent,
@@ -54,14 +54,18 @@ const deleteMonitor = () => {
 </script>
 
 <template>
-    <Card class="py-2 grid grid-cols-12 max-w-7xl mx-auto">
+    <Card class="py-2 grid grid-cols-12">
         <div
             class="flex items-center space-x-4 px-4 col-span-2 border-r-2 border-accent/80 my-2"
         >
             <div
-                class="h-4 w-4 shrink-0 bg-success/40 rounded-full flex items-center justify-center"
+                class="h-4 w-4 shrink-0 rounded-full flex items-center justify-center"
+                :class="monitor.status ? 'bg-success/40' : 'bg-destructive/40'"
             >
-                <div class="h-2 w-2 bg-success rounded-full" />
+                <div
+                    class="h-2 w-2 rounded-full"
+                    :class="monitor.status ? 'bg-success' : 'bg-destructive'"
+                />
             </div>
             <div class="flex flex-col overflow-hidden">
                 <span class="truncate font-bold">{{ monitor.name }}</span>
@@ -72,6 +76,7 @@ const deleteMonitor = () => {
         </div>
 
         <Chart
+            v-if="monitor.checks.length > 0"
             class="col-span-8"
             :checks="monitor.checks"
             :check_labels="check_labels"
@@ -82,6 +87,13 @@ const deleteMonitor = () => {
                 show_grid: false,
             }"
         />
+
+        <div v-else class="col-span-8 flex items-center justify-center h-24">
+            <PlugZap class="h-6 w-6 text-foreground mr-2" />
+            <span class="text-foreground"
+                >No data available. Connection issues?</span
+            >
+        </div>
 
         <div
             class="flex justify-center space-x-4 col-span-2 border-l-2 border-accent/80 my-2 items-center"
@@ -132,7 +144,7 @@ const deleteMonitor = () => {
                         <div class="items-center gap-4">
                             <Label class="text-right"> Name </Label>
                             <div
-                                class="font-mono px-4 mb-2 py-2 rounded-lg bg-foreground text-background"
+                                class="font-mono px-4 mb-4 py-2 rounded-lg bg-foreground text-background"
                             >
                                 {{ monitor.name }}
                             </div>

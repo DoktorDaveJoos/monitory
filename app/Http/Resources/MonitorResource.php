@@ -30,6 +30,7 @@ class MonitorResource extends JsonResource
             'active' => $this->active,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+            'status' => $this->checks->last()?->success ?? null,
             'uptime' => $this->checks()->count() > 0
                 ? Number::percentage(
                     number: $this->checks()

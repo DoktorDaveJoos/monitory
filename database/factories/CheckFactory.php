@@ -20,11 +20,11 @@ class CheckFactory extends Factory
     {
         return [
             'monitor_id' => Monitor::factory()->create(),
-            'status_code' => $this->faker->randomElement([200, 404, 500]),
+            'status_code' => fake()->randomElement([200, 404, 500]),
             'response_time' => $this->faker->numberBetween(50, 1000),
             'response_body' => null,
             'response_headers' => null,
-            'success' => $this->faker->boolean(),
+            'success' => fake()->boolean(98),
             'started_at' => now(),
             'finished_at' => now(),
             'created_at' => now(),
@@ -37,6 +37,7 @@ class CheckFactory extends Factory
             static $index = 0;
             $time = (clone $startTime)->addMinutes($index * $intervalMinutes);
             $index++;
+
             return [
                 'created_at' => $time,
                 'updated_at' => $time,

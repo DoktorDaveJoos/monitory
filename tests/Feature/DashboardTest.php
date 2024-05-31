@@ -31,10 +31,14 @@ class DashboardTest extends TestCase
     {
         $this->actingAs($this->user);
 
-        $this->get('/dashboard')
+        $this->assertDatabaseEmpty('monitors');
+
+        $response = $this->get('/dashboard');
+
+        $response
             ->assertInertia(fn (AssertableInertia $page) => $page
                 ->component('Dashboard')
-                ->has('monitors', 0)
+                ->has('monitors.data', 0)
             );
     }
 }

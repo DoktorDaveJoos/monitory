@@ -6,10 +6,12 @@ use App\Actions\MonitorStrategies\HttpMonitorStrategy;
 use App\Enums\ActionType;
 use App\Enums\HttpMethod;
 use App\Models\Monitor;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
+use PHPUnit\Framework\Attributes\Before;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Response;
 use Tests\TestCase;
@@ -20,6 +22,15 @@ class HttpMonitorStrategyTest extends TestCase
 
     const URL = 'https://example.com';
 
+    #[Before]
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->user = User::factory()->create();
+        $this->actingAs($this->user);
+    }
+
     #[DataProvider('methodProvider')]
     public function test_check_created_with_method(HttpMethod $method): void
     {
@@ -28,6 +39,7 @@ class HttpMonitorStrategyTest extends TestCase
         ]);
 
         $monitor = Monitor::factory()->create([
+            'user_id' => $this->user->id,
             'type' => ActionType::HTTP,
             'url' => self::URL,
             'method' => $method,
@@ -56,6 +68,7 @@ class HttpMonitorStrategyTest extends TestCase
         ]);
 
         $monitor = Monitor::factory()->create([
+            'user_id' => $this->user->id,
             'type' => ActionType::HTTP,
             'url' => self::URL,
         ]);
@@ -103,6 +116,7 @@ class HttpMonitorStrategyTest extends TestCase
         ]);
 
         $monitor = Monitor::factory()->create([
+            'user_id' => $this->user->id,
             'type' => ActionType::HTTP,
             'url' => self::URL,
         ]);

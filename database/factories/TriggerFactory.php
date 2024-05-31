@@ -6,6 +6,7 @@ use App\Enums\Operator;
 use App\Enums\TriggerType;
 use App\Models\Monitor;
 use App\Models\Trigger;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**

@@ -12,10 +12,12 @@ use App\Enums\TriggerType;
 use App\Models\Check;
 use App\Models\Monitor;
 use App\Models\Trigger;
+use App\Models\User;
 use Database\Factories\CheckFactory;
 use Database\Factories\TriggerFactory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
+use PHPUnit\Framework\Attributes\Before;
 use PHPUnit\Framework\Attributes\DataProvider;
 use ReflectionClass;
 use ReflectionException;
@@ -25,6 +27,15 @@ use Tests\TestCase;
 class PerformCheckValidationTest extends TestCase
 {
     use RefreshDatabase;
+
+    #[Before]
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->user = User::factory()->create();
+        $this->actingAs($this->user);
+    }
 
     public function test_alert_is_triggered_when_check_fails(): void
     {
@@ -43,6 +54,7 @@ class PerformCheckValidationTest extends TestCase
             )->create([
                 'type' => ActionType::HTTP,
                 'method' => HttpMethod::GET,
+                'user_id' => $this->user->id,
             ]);
 
         $result = PerformCheckAction::run(
@@ -80,6 +92,7 @@ class PerformCheckValidationTest extends TestCase
             )->create([
                 'type' => ActionType::HTTP,
                 'method' => HttpMethod::GET,
+                'user_id' => $this->user->id,
             ]);
 
         $result = PerformCheckAction::run(

@@ -4,7 +4,7 @@ import { Label } from '@/Components/ui/label';
 
 defineProps<{
     label: string;
-    value: string;
+    value: string | number;
 }>();
 </script>
 

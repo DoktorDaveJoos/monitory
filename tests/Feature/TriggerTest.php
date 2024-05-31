@@ -24,7 +24,7 @@ class TriggerTest extends TestCase
 
     public function test_non_authenticated_user_cannot_create_trigger_for_monitor(): void
     {
-        $monitor = $this->user->monitors->first();
+        $monitor = Monitor::factory()->create();
 
         $response = $this->post(route('trigger.store', $monitor), [
             'type' => TriggerType::HTTP_STATUS_CODE->value,
@@ -99,7 +99,7 @@ class TriggerTest extends TestCase
             'trigger' => $trigger,
         ]));
 
-        $response->assertForbidden();
+        $response->assertNotFound();
 
         $this->assertDatabaseHas('triggers', [
             'id' => $trigger->id,

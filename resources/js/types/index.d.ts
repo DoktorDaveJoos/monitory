@@ -25,6 +25,7 @@ export interface Monitor {
     active: boolean;
     method: string;
     uptime: string;
+    status: boolean;
     last_checked_at: string;
     checks: Array<Check>;
 }
@@ -34,8 +35,18 @@ export interface Check {
     success: boolean;
     response_time: number;
     status_code: number;
+    response_headers: string;
+    response_body: string;
     created_at: string;
     started_at: string;
+}
+
+export interface Stats {
+    total_checks: number;
+    total_notifications: number;
+    total_monitors: number;
+    uptime_overall: string;
+    average_response_time: string;
 }
 
 export type PageProps<

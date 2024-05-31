@@ -10,6 +10,7 @@ use App\Enums\Operator;
 use App\Enums\TriggerType;
 use App\Models\Monitor;
 use App\Models\Trigger;
+use App\Notifications\MonitorRecovered;
 use App\Notifications\TriggerAlert;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
@@ -82,5 +83,38 @@ class PerformCheckNotificationTest extends TestCase
         );
 
         Notification::assertNothingSent();
+    }
+
+    public function test_notification_is_sent_when_monitor_recovers(): void
+    {
+        Notification::fake();
+
+        $monitor = Monitor::factory()
+            ->has(
+                Trigger::factory()
+                    ->state([
+                        'type' => TriggerType::HTTP_STATUS_CODE,
+                        'value' => Response::HTTP_OK,
+                        'operator' => Operator::NOT_EQUALS,
+                    ])
+            )->create([
+                'type' => ActionType::HTTP,
+                'method' => HttpMethod::GET,
+                'success' => false, // Monitor is in failed state
+            ]);
+
+        $passable = MonitorPassableDTO::make(
+            monitor: $monitor
+        );
+
+        PerformCheckNotification::run(
+            $passable,
+            fn ($result) => $result
+        );
+
+        Notification::assertSentTo(
+            notifiable: [$monitor->user],
+            notification: MonitorRecovered::class
+        );
     }
 }

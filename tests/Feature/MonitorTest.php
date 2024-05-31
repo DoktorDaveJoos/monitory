@@ -56,7 +56,7 @@ class MonitorTest extends TestCase
                     ->where('triggers', [])
                     ->etc()
                     ->missing('user_id')
-                )->has('checks', 0)
+                )->has('checks.data', 0)
             );
     }
 
@@ -108,7 +108,7 @@ class MonitorTest extends TestCase
                     )
                     ->etc()
                     ->missing('user_id')
-                )->has('checks', 1, fn (AssertableInertia $page) => $page
+                )->has('checks.data', 1, fn (AssertableInertia $page) => $page
                 ->where('status_code', Response::HTTP_INTERNAL_SERVER_ERROR)
                 ->where('response_time', 1000)
                 ->where('response_body', 'Internal Server Error')
@@ -145,7 +145,7 @@ class MonitorTest extends TestCase
         $this->get("/monitor/$monitor->id?from=$from&to=$to")
             ->assertInertia(fn (AssertableInertia $page) => $page
                 ->component('Monitor/Show')
-                ->has('checks', 0)
+                ->has('checks.data', 0)
             );
     }
 
@@ -195,7 +195,7 @@ class MonitorTest extends TestCase
         $this->get("/monitor/$monitor->id?from=$from&to=$to")
             ->assertInertia(fn (AssertableInertia $page) => $page
                 ->component('Monitor/Show')
-                ->has('checks', 2)
+                ->has('checks.data', 2)
             );
     }
 
@@ -426,6 +426,6 @@ class MonitorTest extends TestCase
 
         $response = $this->get("/monitor/$monitor->id");
 
-        $response->assertForbidden();
+        $response->assertNotFound();
     }
 }

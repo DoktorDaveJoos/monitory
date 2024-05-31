@@ -22,6 +22,8 @@ use Illuminate\Support\Collection;
  * @property string url
  * @property int interval
  * @property bool active
+ * @property int alert_count
+ * @property bool success
  * @property string last_checked_at
  * @property User user
  * @property Collection<Check> checks

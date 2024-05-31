@@ -24,6 +24,8 @@ class CheckResource extends JsonResource
             'status_code' => $this->status_code,
             'response_time' => $this->response_time,
             'success' => $this->success,
+            'response_headers' => $this->response_headers,
+            'response_body' => $this->response_body,
             'created_at' => $this->created_at,
             'started_at' => Carbon::parse($this->started_at)->format('Y-m-d H:i'),
         ];

@@ -9,16 +9,27 @@ use App\Enums\TriggerType;
 use App\Jobs\PerformCheck;
 use App\Models\Monitor;
 use App\Models\Trigger;
+use App\Models\User;
 use App\Notifications\TriggerAlert;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Notification;
+use PHPUnit\Framework\Attributes\Before;
 use Symfony\Component\HttpFoundation\Response;
 use Tests\TestCase;
 
 class PerformCheckTest extends TestCase
 {
     use RefreshDatabase;
+
+    #[Before]
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->user = User::factory()->create();
+        $this->actingAs($this->user);
+    }
 
     public function test_check_has_performed_and_triggered_an_alert(): void
     {
@@ -37,6 +48,7 @@ class PerformCheckTest extends TestCase
                         'operator' => Operator::NOT_EQUALS,
                     ])
             )->create([
+                'user_id' => $this->user->id,
                 'type' => ActionType::HTTP,
                 'method' => HttpMethod::GET,
             ]);
@@ -73,6 +85,7 @@ class PerformCheckTest extends TestCase
                         'operator' => Operator::NOT_EQUALS,
                     ])
             )->create([
+                'user_id' => $this->user->id,
                 'type' => ActionType::HTTP,
                 'method' => HttpMethod::GET,
             ]);

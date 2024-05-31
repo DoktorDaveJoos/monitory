@@ -29,6 +29,9 @@ return new class extends Migration
             $table->string('method')->nullable();
             $table->timestamp('last_checked_at')->nullable();
 
+            $table->integer('alert_count')->default(0);
+            $table->boolean('success')->default(false);
+
             // Create indices
             $table->index('interval');
 

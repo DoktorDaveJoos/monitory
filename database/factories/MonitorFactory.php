@@ -26,9 +26,18 @@ class MonitorFactory extends Factory
             'type' => ActionType::HTTP,
             'url' => $this->faker->url,
             'method' => HttpMethod::GET,
+            'alert_count' => $this->faker->numberBetween(0, 10),
+            'success' => fake()->boolean(98),
             'interval' => 5,
             'active' => true,
             'last_checked_at' => now(),
         ];
+    }
+
+    public function forUser(User $user): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'user_id' => $user->id,
+        ]);
     }
 }
