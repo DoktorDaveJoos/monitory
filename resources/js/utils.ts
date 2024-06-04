@@ -24,7 +24,7 @@ export const fillMissingChecks = (
         const label = labels[i];
         const check = checks.find((c) => c.started_at === label);
 
-        filledChecks[i] = check || {
+        filledChecks[i] = <Check>check || {
             id: -1,
             success: false,
             response_time: 0,
@@ -35,3 +35,14 @@ export const fillMissingChecks = (
     }
     return filledChecks;
 };
+
+export async function isUrlReachable(url: string) {
+    try {
+        const response = await fetch(url, { method: 'HEAD', mode: 'no-cors' });
+        // If we get a response, even if it's 4xx or 5xx, consider it reachable
+        return true;
+    } catch (error) {
+        // If there's an error, such as a network error or DNS resolution failure, consider it unreachable
+        return false;
+    }
+}

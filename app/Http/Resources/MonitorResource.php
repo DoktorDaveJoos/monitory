@@ -31,14 +31,14 @@ class MonitorResource extends JsonResource
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'status' => $this->checks->last()?->success ?? null,
-            'uptime' => $this->checks()->count() > 0
-                ? Number::percentage(
-                    number: $this->checks()
+            'uptime' => Number::percentage(
+                number: $this->checks()->count() > 0
+                    ? $this->checks()
                         ->where('success', true)
-                        ->count() / $this->checks()->count() * 100,
-                    precision: 2
-                )
-                : 0,
+                        ->count() / $this->checks()->count() * 100
+                    : 0,
+                precision: 2
+            ),
             'checks' => CheckResource::collection(
                 $this->checks()
                     ->where('started_at', '>=', now()->subHour())
