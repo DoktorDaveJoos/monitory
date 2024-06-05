@@ -255,7 +255,7 @@ const hasMonitors = computed(() => {
                     <!-- Page Heading -->
                     <header v-if="$slots.header">
                         <div
-                            class="max-w-7xl mx-auto pt-6 pb-10 flex justify-between"
+                            class="max-w-7xl mx-auto pt-6 pb-10 flex justify-between items-center space-x-4 xl:space-x-6"
                         >
                             <slot name="header" />
                             <slot name="center" />

@@ -165,6 +165,7 @@ tryOnMounted(() => {
         <canvas
             :class="
                 cn(
+                    'max-h-24',
                     options.size === 'large' && 'max-h-32',
                     options.size === 'small' && 'max-h-20',
                 )

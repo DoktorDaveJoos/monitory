@@ -22,21 +22,21 @@ defineProps<{
             <LayoutHeader :icon="Settings" label="Settings" />
         </template>
 
-        <div class="pb-12 space-y-6">
+        <div class="pb-12 space-y-6 max-w-7xl mx-auto w-full">
             <Card class="p-4 sm:p-8">
                 <UpdateProfileInformationForm
                     :must-verify-email="mustVerifyEmail"
                     :status="status"
-                    class="max-w-xl"
+                    class="max-w-7xl"
                 />
             </Card>
 
             <Card class="p-4 sm:p-8">
-                <UpdatePasswordForm class="max-w-xl" />
+                <UpdatePasswordForm class="max-7xl-xl" />
             </Card>
 
             <Card class="p-4 sm:p-8">
-                <DeleteUserForm class="max-w-xl" />
+                <DeleteUserForm class="max-7w-xl" />
             </Card>
         </div>
     </AuthenticatedLayout>

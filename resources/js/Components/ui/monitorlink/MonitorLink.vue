@@ -32,7 +32,8 @@ function initials(): string {
         :href="route('monitor.show', monitorListItem.id)"
         :class="
             cn(
-                'inline-flex group cursor-pointer space-x-4 text-primary-foreground/80 overflow-hidden w-full h-10 px-4 py-2 font-medium items-center justify-start bg-background-dark hover:bg-background-dark/90 rounded-lg text-sm ring-offset-background focus-visible:outline-none focus:ring-2 focus:ring-offset-2 hover:text-foreground focus:ring-background-dark transition-colors duration-300',
+                'inline-flex group cursor-pointer space-x-4 text-primary-foreground/80 overflow-hidden w-full h-10 px-4 py-2 font-medium items-center justify-start bg-background-dark hover:bg-background-dark/90 rounded-lg text-sm ring-offset-background focus:ring-2 focus:ring-offset-2 hover:text-foreground transition-colors duration-300',
+                'inline-flex group cursor-pointer space-x-4 text-primary-foreground/80 overflow-hidden w-full h-10 px-4 py-2 font-medium items-center justify-start bg-background-dark hover:bg-background-dark/90 rounded-lg text-sm ring-offset-background focus:ring-2 focus:ring-offset-2 hover:text-foreground transition-colors duration-300',
                 isActive &&
                     'text-primary-foreground ring-2 ring-offset-2 ring-offset-background',
                 collapsed && 'px-0 justify-center',
@@ -48,14 +49,14 @@ function initials(): string {
             </template>
             <template v-else-if="monitorListItem.status">
                 <div
-                    class="h-4 w-4 rounded-full bg-success/40 flex items-center justify-center"
+                    class="h-4 w-4 shrink-0 rounded-full bg-success/40 flex items-center justify-center"
                 >
                     <div class="h-2 w-2 rounded-full bg-success"></div>
                 </div>
             </template>
             <template v-else>
                 <div
-                    class="h-4 w-4 rounded-full bg-destructive/40 flex items-center justify-center"
+                    class="h-4 w-4 shrink-0 rounded-full bg-destructive/40 flex items-center justify-center"
                 >
                     <div class="h-2 w-2 rounded-full bg-destructive"></div>
                 </div>
