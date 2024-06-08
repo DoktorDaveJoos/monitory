@@ -3,21 +3,23 @@ import { Head, Link, useForm } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Chart } from '@/Components/ui/chart';
 import {
-    Check,
     Monitor,
+    MonitorStats as MonitorStatsType,
     OptionEnum,
     ResourceCollection,
+    ResourceItem,
     Trigger,
 } from '@/types';
 import {
     CircleAlert,
     ExternalLink,
     Monitor as MonitorIcon,
+    PlugZap,
     Plus,
     Trash2,
 } from 'lucide-vue-next';
 import LayoutHeader from '@/Components/LayoutHeader.vue';
-import { computed, ref, watch } from 'vue';
+import { ref, watch } from 'vue';
 import { Card } from '@/Components/ui/card';
 import { Button } from '@/Components/ui/button';
 import { Label } from '@/Components/ui/label';
@@ -46,8 +48,7 @@ import {
 import { Alert, AlertDescription, AlertTitle } from '@/Components/ui/alert';
 
 const props = defineProps<{
-    monitor: Monitor;
-    checks: ResourceCollection<Check>;
+    monitor: ResourceItem<Monitor>;
     check_labels: Array<string>;
     trigger: ResourceCollection<Trigger>;
     trigger_options: {
@@ -55,6 +56,7 @@ const props = defineProps<{
         operators: ResourceCollection<OptionEnum>;
         http_status_codes: ResourceCollection<OptionEnum>;
     };
+    monitor_stats: MonitorStatsType;
 }>();
 
 const confirmingMonitorDeletion = ref(false);
@@ -65,14 +67,14 @@ const monitorForm = useForm<{
     method: string;
     interval: string;
 }>({
-    method: props.monitor.method,
-    interval: props.monitor.interval.toString(),
+    method: props.monitor.data.method,
+    interval: props.monitor.data.interval.toString(),
 });
 
 const triggerForm = useForm<{
     type: string;
     operator: string;
-    value: string | number;
+    value: string;
 }>({
     type: '',
     operator: '',
@@ -86,7 +88,7 @@ watch(confirmingMonitorDeletion, (value) => {
 });
 
 const deleteMonitor = () => {
-    useForm({}).delete(route('monitor.destroy', props.monitor.id), {
+    useForm({}).delete(route('monitor.destroy', props.monitor.data.id), {
         onSuccess: () => {
             confirmingMonitorDeletion.value = false;
             useToast().toast({
@@ -98,13 +100,8 @@ const deleteMonitor = () => {
     });
 };
 
-// @todo fix this
-const up = computed(
-    () => props.checks.data[props.checks.data.length - 1]?.success,
-);
-
 const addTrigger = () => {
-    triggerForm.post(route('trigger.store', props.monitor.id), {
+    triggerForm.post(route('trigger.store', props.monitor.data.id), {
         onSuccess: () => {
             createTriggerDialog.value = false;
             triggerForm.reset();
@@ -119,7 +116,7 @@ const addTrigger = () => {
 const deleteTrigger = (id: string | number) => {
     useForm({}).delete(
         route('trigger.destroy', {
-            monitor: props.monitor.id,
+            monitor: props.monitor.data.id,
             trigger: id,
         }),
         {
@@ -140,23 +137,31 @@ const deleteTrigger = (id: string | number) => {
     <AuthenticatedLayout>
         <template #header>
             <div class="flex space-x-4 items-center overflow-hidden">
-                <LayoutHeader :icon="MonitorIcon" :label="monitor.name" />
+                <LayoutHeader :icon="MonitorIcon" :label="monitor.data.name" />
                 <div
                     class="h-5 w-5 flex shrink-0 rounded-full items-center justify-center"
-                    :class="up ? 'bg-success/40' : 'bg-destructive/40'"
+                    :class="
+                        monitor.data.status
+                            ? 'bg-success/40'
+                            : 'bg-destructive/40'
+                    "
                 >
                     <div
                         class="h-3 w-3 rounded-full"
-                        :class="up ? 'bg-success' : 'bg-destructive'"
+                        :class="
+                            monitor.data.status
+                                ? 'bg-success'
+                                : 'bg-destructive'
+                        "
                     />
                 </div>
             </div>
         </template>
         <template #center>
             <Card class="px-4 py-2 h-10 flex space-x-2 overflow-hidden">
-                <span class="font-bold">{{ monitor.method }}</span>
+                <span class="font-bold">{{ monitor.data.method }}</span>
                 <div class="border-r-2 border-accent my-1" />
-                <span class="truncate">{{ monitor.url }}</span>
+                <span class="truncate">{{ monitor.data.url }}</span>
             </Card>
         </template>
         <template #actions>
@@ -189,16 +194,16 @@ const deleteTrigger = (id: string | number) => {
                                 <div
                                     class="font-mono px-4 mb-4 py-2 rounded-lg bg-foreground text-background"
                                 >
-                                    {{ monitor.name }}
+                                    {{ monitor.data.name }}
                                 </div>
                                 <Label
-                                    :for="`name-confirmation-${monitor.id}`"
+                                    :for="`name-confirmation-${monitor.data.id}`"
                                     class="text-right"
                                 >
                                     Repeat the monitor name to confirm
                                 </Label>
                                 <Input
-                                    :id="`name-confirmation-${monitor.id}`"
+                                    :id="`name-confirmation-${monitor.data.id}`"
                                     v-model="nameConfirmation"
                                     class="col-span-3"
                                 />
@@ -208,7 +213,9 @@ const deleteTrigger = (id: string | number) => {
                         <DialogFooter>
                             <Button
                                 variant="destructive"
-                                :disabled="nameConfirmation !== monitor.name"
+                                :disabled="
+                                    nameConfirmation !== monitor.data.name
+                                "
                                 @click="deleteMonitor"
                             >
                                 Delete Monitor
@@ -236,8 +243,8 @@ const deleteTrigger = (id: string | number) => {
             <Label>Overview</Label>
             <Card class="relative py-4 mt-1">
                 <Chart
-                    v-if="checks.data.length > 0"
-                    :checks="checks"
+                    v-if="monitor.data.checks.length > 0"
+                    :checks="monitor.data.checks"
                     :check_labels="check_labels"
                     :options="{
                         size: 'large',
@@ -245,17 +252,42 @@ const deleteTrigger = (id: string | number) => {
                         show_x_ticks: true,
                     }"
                 />
+                <div v-else>
+                    <div class="flex justify-center items-center h-40">
+                        <PlugZap class="w-6 h-6 mr-2" />
+                        <span
+                            >Monitor just created. Waiting for first
+                            check.</span
+                        >
+                    </div>
+                </div>
 
                 <div class="flex justify-center mt-2">
                     <div class="grid grid-cols-2 md:grid-cols-5 gap-2">
-                        <MonitorStats label="Success" value="345" trend="5%" />
-                        <MonitorStats label="4xx" value="45" trend="0%" />
-                        <MonitorStats label="5xx" value="4" trend="-5%" />
-                        <MonitorStats label="Timeouts" value="11" trend="5%" />
+                        <MonitorStats
+                            label="2xx"
+                            :value="monitor_stats['2xx'].absolute"
+                            :trend="monitor_stats['2xx'].percentage"
+                        />
+                        <MonitorStats
+                            label="4xx"
+                            :value="monitor_stats['4xx'].absolute"
+                            :trend="monitor_stats['4xx'].percentage"
+                        />
+                        <MonitorStats
+                            label="5xx"
+                            :value="monitor_stats['5xx'].absolute"
+                            :trend="monitor_stats['5xx'].percentage"
+                        />
+                        <MonitorStats
+                            label="Timeouts"
+                            :value="monitor_stats.timeouts.absolute"
+                            :trend="monitor_stats.timeouts.percentage"
+                        />
                         <MonitorStats
                             label="Responsetime"
-                            value="186ms"
-                            trend="5%"
+                            :value="monitor_stats.latency.overall"
+                            :trend="monitor_stats.latency.last_hour"
                         />
                     </div>
                 </div>
@@ -318,7 +350,7 @@ const deleteTrigger = (id: string | number) => {
                                 class="font-light text-xs text-primary-foreground/50 uppercase"
                                 >{{ _trigger.operator }}</span
                             >
-                            <Label>{{ _trigger.value }}</Label>
+                            <Label>{{ _trigger.value.toString() }}</Label>
                         </div>
                         <button @click="deleteTrigger(_trigger.id)">
                             <Trash2 class="w-5 h-5 text-destructive shrink-0" />
@@ -396,7 +428,9 @@ const deleteTrigger = (id: string | number) => {
                                                 <SelectItem
                                                     v-for="type in trigger_options
                                                         .operators.data"
-                                                    :value="type.value"
+                                                    :value="
+                                                        type.value.toString()
+                                                    "
                                                 >
                                                     {{ type.label }}
                                                 </SelectItem>
@@ -429,7 +463,9 @@ const deleteTrigger = (id: string | number) => {
                                                 <SelectItem
                                                     v-for="status_code in trigger_options
                                                         .http_status_codes.data"
-                                                    :value="status_code.value"
+                                                    :value="
+                                                        status_code.value.toString()
+                                                    "
                                                 >
                                                     {{ status_code.label }}
                                                 </SelectItem>

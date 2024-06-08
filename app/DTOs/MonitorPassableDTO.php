@@ -11,7 +11,7 @@ class MonitorPassableDTO
 
     private array $reasons = [];
 
-    private Check $check;
+    public Check $check;
 
     public function __construct(
         readonly Monitor $monitor,
@@ -38,11 +38,6 @@ class MonitorPassableDTO
     public function setCheck(Check $check): void
     {
         $this->check = $check;
-    }
-
-    public function getCheck(): Check
-    {
-        return $this->check;
     }
 
     public function addReason(string $reason): void

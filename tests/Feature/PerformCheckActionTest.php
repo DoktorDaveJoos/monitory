@@ -41,7 +41,7 @@ class PerformCheckActionTest extends TestCase
 
         $result = PerformCheckAction::run($passable, $closure);
 
-        $this->assertNotNull($result->getCheck());
+        $this->assertNotNull($result->check);
     }
 
     public function test_check_is_returned_with_status_code(): void
@@ -63,7 +63,7 @@ class PerformCheckActionTest extends TestCase
 
         $result = PerformCheckAction::run($passable, $closure);
 
-        $this->assertEquals(200, $result->getCheck()->status_code);
+        $this->assertEquals(200, $result->check->status_code);
     }
 
     public function test_check_is_returned_when_request_times_out(): void
@@ -84,6 +84,6 @@ class PerformCheckActionTest extends TestCase
 
         $result = PerformCheckAction::run($passable, $closure);
 
-        $this->assertEquals('Request timed out', $result->getCheck()->error);
+        $this->assertEquals('Request timed out', $result->check->error);
     }
 }

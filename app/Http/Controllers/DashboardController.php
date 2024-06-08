@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\MonitorResource;
 use App\Models\Check;
-use App\Models\Monitor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Number;
 use Inertia\Inertia;
@@ -17,13 +16,15 @@ class DashboardController extends Controller
     public function __invoke(Request $request)
     {
 
-        $hasMonitors = Monitor::all()->count() > 0;
-        $totalChecksQuery = Check::whereIn('monitor_id', Monitor::all()->pluck('id'));
-        $totalChecksCount = $totalChecksQuery->count();
+        $user = $request->user();
+
+        $hasMonitors = $user->monitors()->count() > 0;
+        $totalChecksCount = Check::whereIn('monitor_id', $user->monitors()->pluck('id'))->count();
 
         return Inertia::render('Dashboard', [
             'monitors' => MonitorResource::collection(
-                Monitor::with('checks')
+                $user->monitors()
+                    ->with('checks')
                     ->orderBy('name')
                     ->get()
             ),
@@ -33,19 +34,19 @@ class DashboardController extends Controller
             ),
             'stats' => [
                 'total_checks' => $totalChecksCount,
-                'total_monitors' => Monitor::all()->count(),
-                'total_notifications' => Monitor::all()->sum('alert_count'),
+                'total_monitors' => $user->monitors()->count(),
+                'total_notifications' => $user->monitors()->sum('alert_count'),
                 'uptime_overall' => Number::percentage(
-                    number: $hasMonitors
-                        ? $totalChecksQuery
+                    number: $hasMonitors && $totalChecksCount > 0
+                        ? Check::whereIn('monitor_id', $user->monitors()->pluck('id'))
                             ->where('success', true)
                             ->count() / $totalChecksCount * 100
                         : 0,
                     precision: 2
                 ),
                 'average_response_time' => Number::format(
-                    number: $hasMonitors
-                    ? $totalChecksQuery->avg('response_time')
+                    number: $hasMonitors && $totalChecksCount > 0
+                    ? Check::whereIn('monitor_id', $user->monitors()->pluck('id'))->avg('response_time')
                     : 0,
                     maxPrecision: 0
                 ).'ms',

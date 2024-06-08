@@ -45,7 +45,7 @@ class HttpMonitorStrategy implements MonitorStrategy
             'monitor_id' => $this->monitor_id,
             'status_code' => $response->status(),
             'response_time' => (int) $response_time,
-            'response_body' => $response->body() ?? null,
+            'response_body' => null,
             'response_headers' => $response->headers() ? json_encode($response->headers()) : null,
             'started_at' => $start,
             'finished_at' => $end,

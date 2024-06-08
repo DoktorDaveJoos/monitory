@@ -27,6 +27,12 @@ class PerformCheckNotification
 
         // Only send alert if monitor is not already in failed state
         if ($monitorPassableDTO->failed() && $monitorPassableDTO->monitor->success) {
+
+            Log::debug('Sending alert', [
+                'monitor_id' => $monitorPassableDTO->monitor->id,
+                'reasons' => $monitorPassableDTO->getReasons(),
+            ]);
+
             Notification::send(
                 $monitorPassableDTO->monitor->user,
                 new TriggerAlert(
@@ -35,23 +41,22 @@ class PerformCheckNotification
                 )
             );
 
-            if ($monitorPassableDTO->monitor->success) {
-                $monitorPassableDTO->monitor->update(['success' => false]);
-            }
-
             return $next($monitorPassableDTO);
         }
 
         // Monitor is back online
-        if (! $monitorPassableDTO->monitor->success) {
+        if (! $monitorPassableDTO->monitor->success && ! $monitorPassableDTO->failed()) {
+
+            Log::debug('Sending recovery notification', [
+                'monitor_id' => $monitorPassableDTO->monitor->id,
+            ]);
+
             Notification::send(
                 $monitorPassableDTO->monitor->user,
                 new MonitorRecovered(
                     monitorId: $monitorPassableDTO->monitor->id
                 )
             );
-
-            $monitorPassableDTO->monitor->update(['success' => true]);
         }
 
         return $next($monitorPassableDTO);

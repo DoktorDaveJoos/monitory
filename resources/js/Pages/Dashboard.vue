@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, useForm } from '@inertiajs/vue3';
-import { Home, PlugZap, Plus } from 'lucide-vue-next';
+import { Home, PlugZap, Plus, MonitorOff } from 'lucide-vue-next';
 import LayoutHeader from '@/Components/LayoutHeader.vue';
 import DashboardChart from '@/Components/DashboardChart.vue';
 import { Monitor, ResourceCollection, Stats as StatsType } from '@/types';
@@ -11,6 +11,7 @@ import { Button } from '@/Components/ui/button';
 import {
     Dialog,
     DialogContent,
+    DialogDescription,
     DialogFooter,
     DialogHeader,
     DialogTitle,
@@ -28,7 +29,6 @@ import {
     SelectValue,
 } from '@/Components/ui/select';
 import InputError from '@/Components/InputError.vue';
-import axios from 'axios';
 import { isUrlReachable } from '@/utils';
 
 defineProps<{
@@ -77,10 +77,11 @@ const testConnection = async () => {
                 </DialogTrigger>
                 <DialogContent class="sm:max-w-2xl">
                     <DialogHeader>
-                        <DialogTitle class="flex"
-                            >Create Monitor
-                            <Plus class="h-4 w-4 ml-1" />
-                        </DialogTitle>
+                        <DialogTitle class="flex">Create Monitor</DialogTitle>
+                        <DialogDescription>
+                            Create a new monitor to keep track of your website
+                            uptime.
+                        </DialogDescription>
                     </DialogHeader>
                     <div class="grid gap-4 grid-cols-2 mb-4">
                         <div>
@@ -240,8 +241,18 @@ const testConnection = async () => {
                 />
             </div>
 
-            <Label class="mb-4">Https / Http</Label>
+            <Label v-if="monitors.data.length > 0" class="mb-4"
+                >Https / Http</Label
+            >
             <div class="pb-12 space-y-6">
+                <div
+                    v-if="monitors.data.length === 0"
+                    class="flex items-center justify-center h-20"
+                >
+                    <MonitorOff class="h-6 w-6 text-foreground mr-2" />
+                    <span class="text-foreground">No monitors yet.</span>
+                </div>
+
                 <DashboardChart
                     v-for="monitor in monitors.data"
                     :monitor="monitor"

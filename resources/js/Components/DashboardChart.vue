@@ -91,7 +91,7 @@ const deleteMonitor = () => {
         <div v-else class="col-span-8 flex items-center justify-center h-20">
             <PlugZap class="h-6 w-6 text-foreground mr-2" />
             <span class="text-foreground"
-                >No recent data available. Connection issues?</span
+                >Monitor just created. Waiting for first check.</span
             >
         </div>
 

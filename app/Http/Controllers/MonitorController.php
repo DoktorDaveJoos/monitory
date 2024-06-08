@@ -11,6 +11,7 @@ use App\Http\Requests\StoreMonitorRequest;
 use App\Http\Requests\UpdateMonitorRequest;
 use App\Http\Resources\CheckResource;
 use App\Http\Resources\EnumOptionResource;
+use App\Http\Resources\MonitorResource;
 use App\Http\Resources\TriggerResource;
 use App\Models\Check;
 use App\Models\Monitor;
@@ -19,6 +20,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Number;
 use Inertia\Response;
 
 class MonitorController extends Controller
@@ -63,20 +65,57 @@ class MonitorController extends Controller
             $to = Carbon::parse($request->input('to'));
         }
 
+        // Statistics
+        $absolute = Check::whereBelongsTo($monitor)->count();
+
+        $successAbsolute = Check::whereBelongsTo($monitor)->whereBetween('status_code', [200, 299])->count();
+        $successTrend = $successAbsolute ? $successAbsolute / $absolute * 100 : 0;
+
+        $fourHundredsAbsolute = Check::whereBelongsTo($monitor)->whereBetween('status_code', [400, 499])->count();
+        $fourHundredsTrend = $fourHundredsAbsolute ? $fourHundredsAbsolute / $absolute * 100 : 0;
+
+        $fiveHundredsAbsolute = Check::whereBelongsTo($monitor)->whereBetween('status_code', [500, 599])->count();
+        $fiveHundredsTrend = $fiveHundredsAbsolute ? $fiveHundredsAbsolute / $absolute * 100 : 0;
+
+        $timeoutsAbsolute = Check::whereBelongsTo($monitor)->where('status_code', HttpStatusCode::SERVICE_UNAVAILABLE)->count();
+        $timeoutsTrend = $timeoutsAbsolute ? $timeoutsAbsolute / $absolute * 100 : 0;
+
+        $averageLatencyOverall = Check::whereBelongsTo($monitor)->avg('response_time') ?? 0;
+        $averageLastHour = Check::whereBelongsTo($monitor)->whereBetween('created_at', [Carbon::now()->subHour(), Carbon::now()])->avg('response_time') * 100;
+        $latencyTrendsLastHour = $averageLatencyOverall && $averageLastHour > 0
+            ? $averageLatencyOverall / $averageLastHour
+            : 0;
+
         return inertia('Monitor/Show', [
-            'monitor' => $monitor->load(['triggers']),
+            'monitor' => MonitorResource::make($monitor),
             'check_labels' => Check::labels($from, $to),
-            'checks' => CheckResource::collection(
-                Check::whereBelongsTo($monitor)
-                    ->whereBetween('created_at', [$from, $to])
-                    ->orderBy('created_at')
-                    ->get()
-            ),
             'trigger' => TriggerResource::collection($monitor->triggers),
             'trigger_options' => [
                 'trigger_types' => EnumOptionResource::collection(TriggerType::cases()),
                 'operators' => EnumOptionResource::collection(Operator::cases()),
                 'http_status_codes' => EnumOptionResource::collection(HttpStatusCode::cases()),
+            ],
+            'monitor_stats' => [
+                '2xx' => [
+                    'absolute' => Number::abbreviate($successAbsolute),
+                    'percentage' => Number::percentage($successTrend),
+                ],
+                '4xx' => [
+                    'absolute' => Number::abbreviate($fourHundredsAbsolute),
+                    'percentage' => Number::percentage($fourHundredsTrend),
+                ],
+                '5xx' => [
+                    'absolute' => Number::abbreviate($fiveHundredsAbsolute),
+                    'percentage' => Number::percentage($fiveHundredsTrend),
+                ],
+                'timeouts' => [
+                    'absolute' => Number::abbreviate($timeoutsAbsolute),
+                    'percentage' => Number::percentage($timeoutsTrend),
+                ],
+                'latency' => [
+                    'overall' => Number::abbreviate($averageLatencyOverall),
+                    'last_hour' => Number::percentage($latencyTrendsLastHour),
+                ],
             ],
         ]);
     }

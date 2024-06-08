@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Actions\PerformCheckAction;
 use App\Actions\PerformCheckNotification;
+use App\Actions\PerformCheckUpdate;
 use App\Actions\PerformCheckValidation;
 use App\DTOs\MonitorPassableDTO;
 use App\Models\Monitor;
@@ -41,6 +42,7 @@ class PerformCheck implements ShouldQueue
                 PerformCheckAction::class,
                 PerformCheckValidation::class,
                 PerformCheckNotification::class,
+                PerformCheckUpdate::class,
             ])
             ->thenReturn();
 

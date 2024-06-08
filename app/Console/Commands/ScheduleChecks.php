@@ -2,8 +2,10 @@
 
 namespace App\Console\Commands;
 
+use App\Jobs\PerformCheck;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ScheduleChecks extends Command
 {
@@ -34,7 +36,8 @@ class ScheduleChecks extends Command
             ->get();
 
         $monitors->each(function ($monitor) {
-
+            Log::debug('Dispatching PerformCheck job', ['monitor_id' => $monitor->id]);
+            PerformCheck::dispatch($monitor->id);
         });
 
     }

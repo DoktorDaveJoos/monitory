@@ -2,6 +2,10 @@ export interface ResourceCollection<T> {
     data: Array<T>;
 }
 
+export interface ResourceItem<T> {
+    data: T;
+}
+
 export interface User {
     id: number;
     name: string;
@@ -54,6 +58,22 @@ export interface Stats {
     total_monitors: number;
     uptime_overall: string;
     average_response_time: string;
+}
+
+export interface MonitorStat {
+    absolute: number;
+    percentage: string;
+}
+
+export interface MonitorStats {
+    '2xx': MonitorStat;
+    '4xx': MonitorStat;
+    '5xx': MonitorStat;
+    timeouts: MonitorStat;
+    latency: {
+        overall: number;
+        last_hour: string;
+    };
 }
 
 export interface OptionEnum {

@@ -29,7 +29,6 @@ use Illuminate\Support\Collection;
  * @property Collection<Check> checks
  * @property Collection<Trigger> triggers
  */
-#[ScopedBy([MonitorScope::class])]
 class Monitor extends Model
 {
     use HasFactory, SoftDeletes;
@@ -49,6 +48,7 @@ class Monitor extends Model
         'timeout',
         'active',
         'method',
+        'success',
         'last_checked_at',
     ];
 
@@ -63,6 +63,11 @@ class Monitor extends Model
     public function scopeActive($query)
     {
         return $query->where('active', true);
+    }
+
+    public function scopeByUser($query, User $user)
+    {
+        return $query->where('user_id', $user->id);
     }
 
     public function user(): BelongsTo

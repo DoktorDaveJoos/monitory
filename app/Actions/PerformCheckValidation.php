@@ -27,7 +27,7 @@ class PerformCheckValidation
         ]);
 
         $monitorPassableDTO->monitor->triggers->each(function (Trigger $trigger) use (&$monitorPassableDTO) {
-            if (self::evaluateTrigger($trigger, $monitorPassableDTO->getCheck())) {
+            if (self::evaluateTrigger($trigger, $monitorPassableDTO->check)) {
 
                 Log::debug('Trigger matched', [
                     'monitor_id' => $monitorPassableDTO->monitor->id,
@@ -46,6 +46,11 @@ class PerformCheckValidation
                 );
             }
         });
+
+        Log::debug('Check validation completed', [
+            'monitor_id' => $monitorPassableDTO->monitor->id,
+            'failed' => $monitorPassableDTO->failed(),
+        ]);
 
         return $next($monitorPassableDTO);
     }

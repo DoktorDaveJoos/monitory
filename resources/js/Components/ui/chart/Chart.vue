@@ -6,7 +6,7 @@ import {
     useResizeObserver,
     watchDebounced,
 } from '@vueuse/core';
-import { Check, ResourceCollection } from '@/types';
+import { Check } from '@/types';
 import { cn, fillMissingChecks, isMultipleOfTenMinutes } from '@/utils';
 import { ref } from 'vue';
 
@@ -19,7 +19,7 @@ export interface ChartOptions {
 
 const props = withDefaults(
     defineProps<{
-        checks: ResourceCollection<Check> | Array<Check>;
+        checks: Array<Check>;
         check_labels: Array<string>;
         options?: ChartOptions;
     }>(),
@@ -32,11 +32,6 @@ const props = withDefaults(
             };
         },
     },
-);
-
-const checks = fillMissingChecks(
-    Array.isArray(props.checks) ? props.checks : props.checks.data,
-    props.check_labels,
 );
 
 Chart.defaults.font.family = 'DM Mono';
@@ -86,18 +81,21 @@ tryOnMounted(() => {
             datasets: [
                 {
                     label: 'Response Time',
-                    data: checks.map((check) => check.response_time),
+                    data: props.checks.map(
+                        (check: Check) => check.response_time,
+                    ),
                     borderWidth: 1,
-                    backgroundColor: checks.map((check, index: number) =>
-                        check.success
-                            ? getGreen(
-                                  (checks.length + index) / 100,
-                                  props.options.fading ?? false,
-                              )
-                            : getRed(
-                                  (checks.length + index) / 100,
-                                  props.options.fading ?? false,
-                              ),
+                    backgroundColor: props.checks.map(
+                        (check: Check, index: number) =>
+                            check.success
+                                ? getGreen(
+                                      (props.checks.length + index) / 100,
+                                      props.options.fading ?? false,
+                                  )
+                                : getRed(
+                                      (props.checks.length + index) / 100,
+                                      props.options.fading ?? false,
+                                  ),
                     ),
                     barThickness: 7,
                 },

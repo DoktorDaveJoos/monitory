@@ -30,6 +30,7 @@ class Check extends Model
         'response_time',
         'response_body',
         'response_headers',
+        'success',
         'started_at',
         'finished_at',
         'created_at',
@@ -40,6 +41,7 @@ class Check extends Model
         'response_time' => 'integer',
         'started_at' => 'datetime',
         'finished_at' => 'datetime',
+        'success' => 'boolean',
     ];
 
     public static function labels(Carbon $from, Carbon $to): array

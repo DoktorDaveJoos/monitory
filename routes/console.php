@@ -1,8 +1,13 @@
 <?php
 
-use Illuminate\Foundation\Inspiring;
-use Illuminate\Support\Facades\Artisan;
+use App\Console\Commands\ScheduleChecks;
+use App\Enums\Interval;
+use Illuminate\Support\Facades\Schedule;
 
-Artisan::command('inspire', function () {
-    $this->comment(Inspiring::quote());
-})->purpose('Display an inspiring quote')->hourly();
+Schedule::command(ScheduleChecks::class, [Interval::MINUTES_5->value])
+    ->description('Handling checks with a 5 minute interval')
+    ->everyFiveMinutes();
+
+Schedule::command(ScheduleChecks::class, [Interval::MINUTES_1->value])
+    ->description('Handling checks with a 1 minute interval')
+    ->everyMinute();

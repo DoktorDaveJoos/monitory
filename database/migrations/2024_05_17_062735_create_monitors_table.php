@@ -30,7 +30,7 @@ return new class extends Migration
             $table->timestamp('last_checked_at')->nullable();
 
             $table->integer('alert_count')->default(0);
-            $table->boolean('success')->default(false);
+            $table->boolean('success')->default(true);
 
             // Create indices
             $table->index('interval');
