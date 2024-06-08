@@ -4,9 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Actions\StoreMonitor;
 use App\Actions\UpdateMonitor;
+use App\Enums\HttpStatusCode;
+use App\Enums\Operator;
+use App\Enums\TriggerType;
 use App\Http\Requests\StoreMonitorRequest;
 use App\Http\Requests\UpdateMonitorRequest;
 use App\Http\Resources\CheckResource;
+use App\Http\Resources\EnumOptionResource;
+use App\Http\Resources\TriggerResource;
 use App\Models\Check;
 use App\Models\Monitor;
 use App\Rules\CheckDateRange;
@@ -67,6 +72,12 @@ class MonitorController extends Controller
                     ->orderBy('created_at')
                     ->get()
             ),
+            'trigger' => TriggerResource::collection($monitor->triggers),
+            'trigger_options' => [
+                'trigger_types' => EnumOptionResource::collection(TriggerType::cases()),
+                'operators' => EnumOptionResource::collection(Operator::cases()),
+                'http_status_codes' => EnumOptionResource::collection(HttpStatusCode::cases()),
+            ],
         ]);
     }
 

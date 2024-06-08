@@ -41,12 +41,24 @@ export interface Check {
     started_at: string;
 }
 
+export interface Trigger {
+    id: number | string;
+    type: string;
+    operator: string;
+    value: string;
+}
+
 export interface Stats {
     total_checks: number;
     total_notifications: number;
     total_monitors: number;
     uptime_overall: string;
     average_response_time: string;
+}
+
+export interface OptionEnum {
+    value: string;
+    label: string;
 }
 
 export type PageProps<

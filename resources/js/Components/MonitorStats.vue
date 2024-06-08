@@ -18,7 +18,6 @@ function checkPercentage() {
     } else if (number > 0) {
         return 'positive';
     } else if (number < 0) {
-        console.log('is negative');
         return 'negative';
     } else {
         return 'neutral';

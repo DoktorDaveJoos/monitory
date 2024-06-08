@@ -2,7 +2,13 @@
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Chart } from '@/Components/ui/chart';
-import { Check, Monitor, ResourceCollection } from '@/types';
+import {
+    Check,
+    Monitor,
+    OptionEnum,
+    ResourceCollection,
+    Trigger,
+} from '@/types';
 import {
     CircleAlert,
     ExternalLink,
@@ -37,21 +43,40 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/Components/ui/select';
+import { Alert, AlertDescription, AlertTitle } from '@/Components/ui/alert';
 
 const props = defineProps<{
     monitor: Monitor;
     checks: ResourceCollection<Check>;
     check_labels: Array<string>;
+    trigger: ResourceCollection<Trigger>;
+    trigger_options: {
+        trigger_types: ResourceCollection<OptionEnum>;
+        operators: ResourceCollection<OptionEnum>;
+        http_status_codes: ResourceCollection<OptionEnum>;
+    };
 }>();
 
 const confirmingMonitorDeletion = ref(false);
 const nameConfirmation = ref('');
-const form = useForm<{
+const createTriggerDialog = ref(false);
+
+const monitorForm = useForm<{
     method: string;
     interval: string;
 }>({
     method: props.monitor.method,
     interval: props.monitor.interval.toString(),
+});
+
+const triggerForm = useForm<{
+    type: string;
+    operator: string;
+    value: string | number;
+}>({
+    type: '',
+    operator: '',
+    value: '',
 });
 
 watch(confirmingMonitorDeletion, (value) => {
@@ -77,6 +102,36 @@ const deleteMonitor = () => {
 const up = computed(
     () => props.checks.data[props.checks.data.length - 1]?.success,
 );
+
+const addTrigger = () => {
+    triggerForm.post(route('trigger.store', props.monitor.id), {
+        onSuccess: () => {
+            createTriggerDialog.value = false;
+            triggerForm.reset();
+            useToast().toast({
+                title: 'Trigger Created',
+                description: 'Your trigger has been created.',
+            });
+        },
+    });
+};
+
+const deleteTrigger = (id: string | number) => {
+    useForm({}).delete(
+        route('trigger.destroy', {
+            monitor: props.monitor.id,
+            trigger: id,
+        }),
+        {
+            onSuccess: () => {
+                useToast().toast({
+                    title: 'Trigger Deleted',
+                    description: 'Your trigger has been deleted.',
+                });
+            },
+        },
+    );
+};
 </script>
 
 <template>
@@ -165,6 +220,19 @@ const up = computed(
         </template>
 
         <div class="max-w-7xl mx-auto w-full">
+            <Alert
+                v-if="trigger.data.length === 0"
+                variant="destructive"
+                class="mb-6"
+            >
+                <CircleAlert class="w-4 h-4" />
+                <AlertTitle>Missing Trigger</AlertTitle>
+                <AlertDescription>
+                    You don't have any triggers setup to notify you when your
+                    monitor fails.
+                </AlertDescription>
+            </Alert>
+
             <Label>Overview</Label>
             <Card class="relative py-4 mt-1">
                 <Chart
@@ -198,7 +266,7 @@ const up = computed(
                     <Label>Settings</Label>
                     <Card class="flex justify-between items-center px-4 h-14">
                         <Label>Method</Label>
-                        <Select v-model="form.method">
+                        <Select v-model="monitorForm.method">
                             <SelectTrigger>
                                 <SelectValue placeholder="Select a method" />
                             </SelectTrigger>
@@ -217,7 +285,7 @@ const up = computed(
                     </Card>
                     <Card class="flex justify-between items-center px-4 h-14">
                         <Label>Interval</Label>
-                        <Select v-model="form.interval">
+                        <Select v-model="monitorForm.interval">
                             <SelectTrigger>
                                 <SelectValue placeholder="Select an Interval" />
                             </SelectTrigger>
@@ -233,7 +301,10 @@ const up = computed(
                 </div>
                 <div class="space-y-2">
                     <Label>Notification Trigger</Label>
-                    <Card class="flex justify-between items-center px-4 h-14">
+                    <Card
+                        v-for="_trigger in trigger.data"
+                        class="flex justify-between items-center px-4 h-14"
+                    >
                         <div class="flex items-center space-x-2">
                             <CircleAlert
                                 class="w-5 h-5 text-destructive shrink-0"
@@ -242,25 +313,146 @@ const up = computed(
                                 class="font-light text-xs text-primary-foreground/50 uppercase"
                                 >When</span
                             >
-                            <Label>Status Code</Label>
+                            <Label>{{ _trigger.type }}</Label>
                             <span
                                 class="font-light text-xs text-primary-foreground/50 uppercase"
-                                >Is Not</span
+                                >{{ _trigger.operator }}</span
                             >
-                            <Label>200</Label>
+                            <Label>{{ _trigger.value }}</Label>
                         </div>
-                        <Trash2 class="w-5 h-5 text-destructive shrink-0" />
+                        <button @click="deleteTrigger(_trigger.id)">
+                            <Trash2 class="w-5 h-5 text-destructive shrink-0" />
+                        </button>
                     </Card>
 
-                    <button
-                        class="rounded-xl w-full border-2 border-dashed text-primary border-primary h-14 flex justify-center items-center px-4 hover:bg-primary/10 hover:border-solid transition-all duration-150"
+                    <Dialog
+                        v-model:open="createTriggerDialog"
+                        :default-open="false"
                     >
-                        <span
-                            class="text-primary uppercase text-xs font-bold tracking-widest"
-                            >More</span
-                        >
-                        <Plus class="w-5 h-5 shrink-0 ml-1" />
-                    </button>
+                        <DialogTrigger as-child>
+                            <button
+                                class="rounded-xl w-full border-2 border-dashed text-primary border-primary h-14 flex justify-center items-center px-4 hover:bg-primary/10 hover:border-solid transition-all duration-150"
+                            >
+                                <span
+                                    class="text-primary uppercase text-xs font-bold tracking-widest"
+                                    >{{
+                                        trigger.data.length === 0
+                                            ? 'Create Trigger'
+                                            : 'More'
+                                    }}</span
+                                >
+                                <Plus class="w-5 h-5 shrink-0 ml-1" />
+                            </button>
+                        </DialogTrigger>
+                        <DialogContent class="sm:max-w-[425px]">
+                            <DialogHeader>
+                                <DialogTitle>Add Trigger</DialogTitle>
+                                <DialogDescription>
+                                    Add a trigger to notify you when your
+                                    monitor fails.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <div class="grid gap-4 py-4">
+                                <div class="items-center gap-4">
+                                    <Label for="type"> Type </Label>
+                                    <Select v-model="triggerForm.type">
+                                        <SelectTrigger class="w-full">
+                                            <SelectValue
+                                                placeholder="Select a trigger type"
+                                            />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectGroup>
+                                                <SelectLabel
+                                                    >Options
+                                                </SelectLabel>
+                                                <SelectItem
+                                                    v-for="type in trigger_options
+                                                        .trigger_types.data"
+                                                    :value="type.value"
+                                                >
+                                                    {{ type.label }}
+                                                </SelectItem>
+                                            </SelectGroup>
+                                        </SelectContent>
+                                    </Select>
+                                    <InputError
+                                        :message="triggerForm.errors.type"
+                                        class="mt-2"
+                                    />
+
+                                    <Label for="type"> Operator </Label>
+                                    <Select v-model="triggerForm.operator">
+                                        <SelectTrigger class="w-full">
+                                            <SelectValue
+                                                placeholder="Select a trigger operator"
+                                            />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectGroup>
+                                                <SelectLabel
+                                                    >Options
+                                                </SelectLabel>
+                                                <SelectItem
+                                                    v-for="type in trigger_options
+                                                        .operators.data"
+                                                    :value="type.value"
+                                                >
+                                                    {{ type.label }}
+                                                </SelectItem>
+                                            </SelectGroup>
+                                        </SelectContent>
+                                    </Select>
+                                    <InputError
+                                        :message="triggerForm.errors.operator"
+                                        class="mt-2"
+                                    />
+
+                                    <Label for="type"> Value </Label>
+                                    <Select
+                                        v-if="
+                                            triggerForm.type ===
+                                            'http_status_code'
+                                        "
+                                        v-model="triggerForm.value"
+                                    >
+                                        <SelectTrigger class="w-full">
+                                            <SelectValue
+                                                placeholder="Select an HTTP status code"
+                                            />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectGroup>
+                                                <SelectLabel
+                                                    >Options
+                                                </SelectLabel>
+                                                <SelectItem
+                                                    v-for="status_code in trigger_options
+                                                        .http_status_codes.data"
+                                                    :value="status_code.value"
+                                                >
+                                                    {{ status_code.label }}
+                                                </SelectItem>
+                                            </SelectGroup>
+                                        </SelectContent>
+                                    </Select>
+                                    <Input v-else v-model="triggerForm.value" />
+                                    <InputError
+                                        :message="triggerForm.errors.operator"
+                                        class="mt-2"
+                                    />
+                                </div>
+                            </div>
+                            <DialogFooter>
+                                <Button
+                                    :disabled="triggerForm.processing"
+                                    @click="addTrigger"
+                                >
+                                    Create Trigger
+                                </Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
 
                     <div class="flex justify-center">
                         <Link
