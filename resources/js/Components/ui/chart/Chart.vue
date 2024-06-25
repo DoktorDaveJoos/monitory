@@ -7,8 +7,8 @@ import {
     watchDebounced,
 } from '@vueuse/core';
 import { Check } from '@/types';
-import { cn, fillMissingChecks, isMultipleOfTenMinutes } from '@/utils';
-import { ref } from 'vue';
+import { cn, isMultipleOfTenMinutes } from '@/utils';
+import { ref, watch } from 'vue';
 
 export interface ChartOptions {
     fading?: boolean;
@@ -68,6 +68,10 @@ const myChart = ref<Chart<'bar', number[], string> | null>(null);
 
 // Make this robust by checking if the element exists
 tryOnMounted(() => {
+    initializeChart();
+});
+
+const initializeChart = () => {
     const ctx: any = document.getElementById('myChart');
 
     if (!ctx && !(ctx instanceof HTMLElement)) {
@@ -155,6 +159,15 @@ tryOnMounted(() => {
             },
         },
     });
+};
+
+watch(props, () => {
+    if (myChart.value) {
+        myChart.value.destroy();
+        myChart.value = null;
+    }
+
+    initializeChart();
 });
 </script>
 

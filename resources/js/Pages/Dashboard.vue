@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, useForm } from '@inertiajs/vue3';
-import { Home, PlugZap, Plus, MonitorOff } from 'lucide-vue-next';
+import { Home, PlugZap, Plus, MonitorOff, Loader2 } from 'lucide-vue-next';
 import LayoutHeader from '@/Components/LayoutHeader.vue';
 import DashboardChart from '@/Components/DashboardChart.vue';
 import { Monitor, ResourceCollection, Stats as StatsType } from '@/types';
@@ -55,8 +55,16 @@ const submit = () => {
     });
 };
 
+const isChecking = ref(false);
 const testConnection = async () => {
-    connection.value = await isUrlReachable(form.url);
+    try {
+        isChecking.value = true;
+        connection.value = await isUrlReachable(form.url);
+        isChecking.value = false;
+    } catch (error) {
+        isChecking.value = false;
+        connection.value = false;
+    }
 };
 </script>
 
@@ -196,11 +204,15 @@ const testConnection = async () => {
                         </div>
                         <Button
                             variant="secondary"
-                            :disabled="!form.url"
+                            :disabled="!form.url || isChecking"
                             @click="testConnection"
                         >
                             Check Connection
-                            <PlugZap class="h-5 w-5 ml-1" />
+                            <Loader2
+                                v-if="isChecking"
+                                class="h-5 w-5 ml-1 animate-spin"
+                            />
+                            <PlugZap v-else class="h-5 w-5 ml-1" />
                         </Button>
                         <Button :disabled="form.processing" @click="submit">
                             Create
