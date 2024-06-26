@@ -53,7 +53,7 @@ class MonitorSeeder extends Seeder
                     ->count(60)
                     ->state(new Sequence(
                         ...array_map(
-                            fn($i) => [
+                            fn ($i) => [
                                 'created_at' => $startTime->copy()->addMinutes($i),
                                 'updated_at' => $startTime->copy()->addMinutes($i),
                                 'started_at' => $startTime->copy()->addMinutes($i),

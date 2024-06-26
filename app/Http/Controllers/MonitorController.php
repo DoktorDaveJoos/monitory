@@ -9,7 +9,6 @@ use App\Enums\Operator;
 use App\Enums\TriggerType;
 use App\Http\Requests\StoreMonitorRequest;
 use App\Http\Requests\UpdateMonitorRequest;
-use App\Http\Resources\CheckResource;
 use App\Http\Resources\EnumOptionResource;
 use App\Http\Resources\MonitorResource;
 use App\Http\Resources\TriggerResource;

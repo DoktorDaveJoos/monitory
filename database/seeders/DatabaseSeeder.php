@@ -21,10 +21,10 @@ class DatabaseSeeder extends Seeder
             'password' => bcrypt('test'),
         ]);
 
-//        MonitorSeeder::runFor($user);
-//
-//        $this->call([
-//            MonitorSeeder::class,
-//        ]);
+        //        MonitorSeeder::runFor($user);
+        //
+        //        $this->call([
+        //            MonitorSeeder::class,
+        //        ]);
     }
 }

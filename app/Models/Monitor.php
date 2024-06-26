@@ -5,8 +5,6 @@ namespace App\Models;
 use App\Enums\ActionType;
 use App\Enums\HttpMethod;
 use App\Enums\Interval;
-use App\Models\Scopes\MonitorScope;
-use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
