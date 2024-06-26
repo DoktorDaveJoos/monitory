@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\IntervalLimit;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -23,11 +24,8 @@ class UpdateMonitorRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255'],
-            'type' => ['required', 'string', 'in:http'],
-            'url' => ['required', 'url:http,https'],
-            'method' => ['required', 'string', 'in:GET,POST,PUT,DELETE'],
-            'interval' => ['required', 'integer', 'in:1,5'],
+            'method' => ['string', 'in:GET,POST,PUT,DELETE'],
+            'interval' => ['integer', 'in:1,5', new IntervalLimit],
         ];
     }
 }

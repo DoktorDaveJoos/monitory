@@ -129,9 +129,6 @@ class MonitorController extends Controller
 
         $monitor = UpdateMonitor::run(
             monitor: $monitor,
-            name: $request->validated('name'),
-            type: $request->validated('type'),
-            url: $request->validated('url'),
             method: $request->validated('method'),
             interval: $request->validated('interval')
         );

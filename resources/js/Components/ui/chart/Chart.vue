@@ -9,6 +9,7 @@ import {
 import { Check } from '@/types';
 import { cn, isMultipleOfTenMinutes } from '@/utils';
 import { ref, watch } from 'vue';
+import { v4 as uuidv4 } from 'uuid';
 
 export interface ChartOptions {
     fading?: boolean;
@@ -64,6 +65,8 @@ const getRed = (opacity: number, fading: boolean) =>
 const getGreen = (opacity: number, fading: boolean) =>
     fading ? `rgba(59, 237, 195, ${opacity})` : `rgba(59, 237, 195, 1)`;
 
+// Generate a unique id for the canvas element
+const myId = uuidv4();
 const myChart = ref<Chart<'bar', number[], string> | null>(null);
 
 // Make this robust by checking if the element exists
@@ -72,7 +75,7 @@ tryOnMounted(() => {
 });
 
 const initializeChart = () => {
-    const ctx: any = document.getElementById('myChart');
+    const ctx: any = document.getElementById(myId);
 
     if (!ctx && !(ctx instanceof HTMLElement)) {
         throw new Error('Could not find canvas element');
@@ -181,7 +184,7 @@ watch(props, () => {
                     options.size === 'small' && 'max-h-20',
                 )
             "
-            id="myChart"
+            :id="myId"
         ></canvas>
     </div>
 </template>

@@ -11,19 +11,25 @@ class UpdateMonitor
 
     public function handle(
         Monitor $monitor,
-        string $name,
-        string $type,
-        string $url,
-        string $method,
-        int $interval
+        ?string $method,
+        ?int $interval
     ): Monitor {
-        $monitor->update([
-            'name' => $name,
-            'type' => $type,
-            'url' => $url,
-            'method' => $method,
-            'interval' => $interval,
-        ]);
+
+        $data = [];
+
+        if ($method) {
+            $data['method'] = $method;
+        }
+
+        if ($interval) {
+            $data['interval'] = $interval;
+        }
+
+        if (empty($data)) {
+            return $monitor;
+        }
+
+        $monitor->update($data);
 
         return $monitor;
     }

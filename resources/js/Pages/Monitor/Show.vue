@@ -129,6 +129,14 @@ const deleteTrigger = (id: string | number) => {
         },
     );
 };
+
+watch(
+    () => [monitorForm.method, monitorForm.interval],
+    () => {
+        monitorForm.put(route('monitor.update', props.monitor.data.id));
+    },
+    { immediate: false },
+);
 </script>
 
 <template>
@@ -330,6 +338,10 @@ const deleteTrigger = (id: string | number) => {
                             </SelectContent>
                         </Select>
                     </Card>
+                    <InputError
+                        :message="monitorForm.errors.interval"
+                        class="mt-2"
+                    />
                 </div>
                 <div class="space-y-2">
                     <Label>Notification Trigger</Label>
