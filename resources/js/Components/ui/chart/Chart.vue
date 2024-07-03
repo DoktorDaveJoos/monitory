@@ -7,7 +7,7 @@ import {
     watchDebounced,
 } from '@vueuse/core';
 import { Check } from '@/types';
-import { cn, isMultipleOfTenMinutes } from '@/utils';
+import { cn, fillMissingChecks, isMultipleOfTenMinutes } from '@/utils';
 import { ref, watch } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -81,6 +81,8 @@ const initializeChart = () => {
         throw new Error('Could not find canvas element');
     }
 
+    const checks = fillMissingChecks(props.checks, props.check_labels);
+
     myChart.value = new Chart(ctx, {
         type: 'bar',
         data: {
@@ -88,9 +90,7 @@ const initializeChart = () => {
             datasets: [
                 {
                     label: 'Response Time',
-                    data: props.checks.map(
-                        (check: Check) => check.response_time,
-                    ),
+                    data: checks.map((check: Check) => check.response_time),
                     borderWidth: 1,
                     backgroundColor: props.checks.map(
                         (check: Check, index: number) =>
@@ -109,6 +109,9 @@ const initializeChart = () => {
             ],
         },
         options: {
+            animation: {
+                duration: 300,
+            },
             responsive: true,
             scales: {
                 x: {

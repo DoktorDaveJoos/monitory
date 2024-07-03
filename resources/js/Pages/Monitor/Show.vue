@@ -301,7 +301,7 @@ watch(
                 </div>
             </Card>
 
-            <div class="grid md:grid-cols-2 gap-4 mt-8">
+            <div class="grid xl:grid-cols-2 gap-4 mt-8">
                 <div class="space-y-2">
                     <Label>Settings</Label>
                     <Card class="flex justify-between items-center px-4 h-14">
@@ -349,20 +349,23 @@ watch(
                         v-for="_trigger in trigger.data"
                         class="flex justify-between items-center px-4 h-14"
                     >
-                        <div class="flex items-center space-x-2">
+                        <div class="flex items-center space-x-2 max-w-full">
                             <CircleAlert
                                 class="w-5 h-5 text-destructive shrink-0"
                             />
                             <span
-                                class="font-light text-xs text-primary-foreground/50 uppercase"
+                                class="font-light text-xs text-primary-foreground/50 uppercase truncate"
                                 >When</span
                             >
-                            <Label>{{ _trigger.type }}</Label>
-                            <span
-                                class="font-light text-xs text-primary-foreground/50 uppercase"
-                                >{{ _trigger.operator }}</span
+                            <Label class="truncate">{{ _trigger.type }}</Label>
+                            <div
+                                class="font-light text-xs text-primary-foreground/50 uppercase truncate"
                             >
-                            <Label>{{ _trigger.value.toString() }}</Label>
+                                {{ _trigger.operator }}
+                            </div>
+                            <Label class="truncate">{{
+                                _trigger.value.toString()
+                            }}</Label>
                         </div>
                         <button @click="deleteTrigger(_trigger.id)">
                             <Trash2 class="w-5 h-5 text-destructive shrink-0" />

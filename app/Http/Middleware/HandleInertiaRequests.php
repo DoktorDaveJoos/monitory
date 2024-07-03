@@ -40,9 +40,13 @@ class HandleInertiaRequests extends Middleware
                 'name' => config('app.name'),
                 'version' => config('app.version'),
             ],
-            'monitor_list' => MonitorListItemResource::collection(
-                Monitor::active()->get()
-            ),
+            'monitor_list' => $request->user ? MonitorListItemResource::collection(
+                $request->user()
+                    ->monitors()
+                    ->active()
+                    ->orderBy('name')
+                    ->get()
+            ) : [],
         ];
     }
 }
