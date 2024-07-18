@@ -3,7 +3,6 @@
 namespace App\Http\Middleware;
 
 use App\Http\Resources\MonitorListItemResource;
-use App\Models\Monitor;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -40,13 +39,15 @@ class HandleInertiaRequests extends Middleware
                 'name' => config('app.name'),
                 'version' => config('app.version'),
             ],
-            'monitor_list' => $request->user ? MonitorListItemResource::collection(
-                $request->user()
-                    ->monitors()
-                    ->active()
-                    ->orderBy('name')
-                    ->get()
-            ) : [],
+            'monitor_list' => MonitorListItemResource::collection(
+                $request->user() ?
+                    $request->user()
+                        ->monitors()
+                        ->active()
+                        ->orderBy('created_at', 'desc')
+                        ->get() :
+                    []
+            ),
         ];
     }
 }

@@ -46,17 +46,18 @@ class MonitorTest extends TestCase
             ->assertInertia(fn (AssertableInertia $page) => $page
                 ->component('Monitor/Show')
                 ->has('monitor', fn (AssertableInertia $page) => $page
-                    ->where('id', $monitor->id)
-                    ->where('name', 'My Monitor')
-                    ->where('type', ActionType::HTTP->value)
-                    ->where('url', self::URL)
-                    ->where('method', HttpMethod::GET->value)
-                    ->where('interval', Interval::MINUTES_5->value)
-                    ->where('active', true)
-                    ->where('triggers', [])
+                    ->where('data.id', $monitor->id)
+                    ->where('data.name', 'My Monitor')
+                    ->where('data.type', ActionType::HTTP->value)
+                    ->where('data.url', self::URL)
+                    ->where('data.method', HttpMethod::GET->value)
+                    ->where('data.interval', Interval::MINUTES_5->value)
+                    ->where('data.active', true)
+                    ->where('data.checks', [])
                     ->etc()
                     ->missing('user_id')
-                )->has('checks.data', 0)
+                )
+                ->has('trigger.data', 0)
             );
     }
 
@@ -93,27 +94,28 @@ class MonitorTest extends TestCase
             ->assertInertia(fn (AssertableInertia $page) => $page
                 ->component('Monitor/Show')
                 ->has('monitor', fn (AssertableInertia $page) => $page
-                    ->where('id', $monitor->id)
-                    ->where('name', 'My Monitor')
-                    ->where('type', ActionType::HTTP->value)
-                    ->where('url', self::URL)
-                    ->where('method', HttpMethod::GET->value)
-                    ->where('interval', Interval::MINUTES_5->value)
-                    ->where('active', true)
-                    ->has('triggers', 1, fn (AssertableInertia $page) => $page
-                        ->where('value', Response::HTTP_INTERNAL_SERVER_ERROR)
-                        ->where('type', TriggerType::HTTP_STATUS_CODE->value)
-                        ->where('operator', Operator::EQUALS->value)
+                    ->where('data.id', $monitor->id)
+                    ->where('data.name', 'My Monitor')
+                    ->where('data.type', ActionType::HTTP->value)
+                    ->where('data.url', self::URL)
+                    ->where('data.method', HttpMethod::GET->value)
+                    ->where('data.interval', Interval::MINUTES_5->value)
+                    ->where('data.active', true)
+                    ->has('data.checks', 1, fn (AssertableInertia $page) => $page
+                        ->where('status_code', Response::HTTP_INTERNAL_SERVER_ERROR)
+                        ->where('response_time', 1000)
+                        ->where('response_body', 'Internal Server Error')
+                        ->where('response_headers', ['Content-Type' => 'text/html'])
                         ->etc()
+                        ->etc()
+                        ->missing('user_id')
                     )
+                )
+                ->has('trigger.data', 1, fn (AssertableInertia $page) => $page
+                    ->where('value', Response::HTTP_INTERNAL_SERVER_ERROR)
+                    ->where('type', TriggerType::HTTP_STATUS_CODE->name)
+                    ->where('operator', Operator::EQUALS->value)
                     ->etc()
-                    ->missing('user_id')
-                )->has('checks.data', 1, fn (AssertableInertia $page) => $page
-                ->where('status_code', Response::HTTP_INTERNAL_SERVER_ERROR)
-                ->where('response_time', 1000)
-                ->where('response_body', 'Internal Server Error')
-                ->where('response_headers', ['Content-Type' => 'text/html'])
-                ->etc()
                 )
             );
     }
