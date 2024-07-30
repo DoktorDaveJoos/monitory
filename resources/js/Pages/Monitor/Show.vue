@@ -292,7 +292,7 @@ watch(
                     :check_labels="check_labels"
                     :options="{
                         size: 'large',
-                        fading: true,
+                        fading: false,
                         show_x_ticks: true,
                     }"
                 />
