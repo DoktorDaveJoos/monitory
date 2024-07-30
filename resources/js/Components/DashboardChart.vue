@@ -3,25 +3,12 @@ import { Link, useForm } from '@inertiajs/vue3';
 import { Monitor } from '@/types';
 import { Card } from '@/Components/ui/card';
 import { Chart } from '@/Components/ui/chart';
-import { BellOff, Edit, PlugZap, Trash2 } from 'lucide-vue-next';
+import { BellOff, Edit, PlugZap } from 'lucide-vue-next';
 // import {
 //     Tooltip,
 //     TooltipContent,
 //     TooltipTrigger,
 // } from '@/Components/ui/tooltip';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from '@/Components/ui/dialog';
-import { Label } from '@/Components/ui/label';
-import { Input } from '@/Components/ui/input';
-import InputError from '@/Components/InputError.vue';
-import { Button } from '@/Components/ui/button';
 import { ref, watch } from 'vue';
 import { useToast } from '@/Components/ui/toast';
 
@@ -117,62 +104,62 @@ const deleteMonitor = () => {
             <!--                </TooltipContent>-->
             <!--            </Tooltip>-->
 
-            <Dialog
-                v-model:open="confirmingMonitorDeletion"
-                :default-open="false"
-            >
-                <DialogTrigger as-child>
-                    <button>
-                        <Trash2
-                            class="h-4 w-4 text-destructive hover:text-destructive/80 transition-colors duration-150"
-                        />
-                    </button>
-                </DialogTrigger>
-                <DialogContent class="sm:max-w-[425px]">
-                    <DialogHeader>
-                        <DialogTitle
-                            >Are you sure you want to delete your monitor?
-                        </DialogTitle>
-                        <DialogDescription>
-                            Once your monitor is deleted, all of its resources
-                            and data will be permanently deleted. Please enter
-                            your password to confirm you would like to
-                            permanently delete your monitor.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <div class="grid gap-4 py-4">
-                        <div class="items-center gap-4">
-                            <Label class="text-right"> Name </Label>
-                            <div
-                                class="font-mono px-4 mb-4 py-2 rounded-lg bg-foreground text-background"
-                            >
-                                {{ monitor.name }}
-                            </div>
-                            <Label
-                                :for="`name-confirmation-${monitor.id}`"
-                                class="text-right"
-                            >
-                                Repeat the monitor name to confirm
-                            </Label>
-                            <Input
-                                :id="`name-confirmation-${monitor.id}`"
-                                v-model="nameConfirmation"
-                                class="col-span-3"
-                            />
-                            <InputError message="" class="mt-2" />
-                        </div>
-                    </div>
-                    <DialogFooter>
-                        <Button
-                            variant="destructive"
-                            :disabled="nameConfirmation !== monitor.name"
-                            @click="deleteMonitor"
-                        >
-                            Delete Monitor
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
+            <!--            <Dialog-->
+            <!--                v-model:open="confirmingMonitorDeletion"-->
+            <!--                :default-open="false"-->
+            <!--            >-->
+            <!--                <DialogTrigger as-child>-->
+            <!--                    <button>-->
+            <!--                        <Trash2-->
+            <!--                            class="h-4 w-4 text-destructive hover:text-destructive/80 transition-colors duration-150"-->
+            <!--                        />-->
+            <!--                    </button>-->
+            <!--                </DialogTrigger>-->
+            <!--                <DialogContent class="sm:max-w-[425px]">-->
+            <!--                    <DialogHeader>-->
+            <!--                        <DialogTitle-->
+            <!--                            >Are you sure you want to delete your monitor?-->
+            <!--                        </DialogTitle>-->
+            <!--                        <DialogDescription>-->
+            <!--                            Once your monitor is deleted, all of its resources-->
+            <!--                            and data will be permanently deleted. Please enter-->
+            <!--                            your password to confirm you would like to-->
+            <!--                            permanently delete your monitor.-->
+            <!--                        </DialogDescription>-->
+            <!--                    </DialogHeader>-->
+            <!--                    <div class="grid gap-4 py-4">-->
+            <!--                        <div class="items-center gap-4">-->
+            <!--                            <Label class="text-right"> Name </Label>-->
+            <!--                            <div-->
+            <!--                                class="font-mono px-4 mb-4 py-2 rounded-lg bg-foreground text-background"-->
+            <!--                            >-->
+            <!--                                {{ monitor.name }}-->
+            <!--                            </div>-->
+            <!--                            <Label-->
+            <!--                                :for="`name-confirmation-${monitor.id}`"-->
+            <!--                                class="text-right"-->
+            <!--                            >-->
+            <!--                                Repeat the monitor name to confirm-->
+            <!--                            </Label>-->
+            <!--                            <Input-->
+            <!--                                :id="`name-confirmation-${monitor.id}`"-->
+            <!--                                v-model="nameConfirmation"-->
+            <!--                                class="col-span-3"-->
+            <!--                            />-->
+            <!--                            <InputError message="" class="mt-2" />-->
+            <!--                        </div>-->
+            <!--                    </div>-->
+            <!--                    <DialogFooter>-->
+            <!--                        <Button-->
+            <!--                            variant="destructive"-->
+            <!--                            :disabled="nameConfirmation !== monitor.name"-->
+            <!--                            @click="deleteMonitor"-->
+            <!--                        >-->
+            <!--                            Delete Monitor-->
+            <!--                        </Button>-->
+            <!--                    </DialogFooter>-->
+            <!--                </DialogContent>-->
+            <!--            </Dialog>-->
         </div>
     </Card>
 </template>
