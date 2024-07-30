@@ -64,7 +64,7 @@ const deleteMonitor = () => {
 
         <Chart
             v-if="monitor.checks.length > 0"
-            class="col-span-8"
+            class="col-span-9"
             :checks="monitor.checks"
             :check_labels="check_labels"
             :options="{
