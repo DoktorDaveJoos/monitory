@@ -75,7 +75,7 @@ const deleteMonitor = () => {
             }"
         />
 
-        <div v-else class="col-span-8 flex items-center justify-center h-20">
+        <div v-else class="col-span-9 flex items-center justify-center h-20">
             <PlugZap class="h-6 w-6 text-foreground mr-2" />
             <span class="text-foreground"
                 >Monitor just created. Waiting for first check.</span
@@ -83,7 +83,7 @@ const deleteMonitor = () => {
         </div>
 
         <div
-            class="flex justify-center space-x-4 col-span-2 border-l-2 border-accent/80 my-2 items-center"
+            class="flex justify-center space-x-4 col-span-1 border-l-2 border-accent/80 my-2 items-center"
         >
             <Link :href="route('monitor.show', monitor.id)">
                 <Edit
