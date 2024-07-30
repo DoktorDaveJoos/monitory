@@ -113,43 +113,50 @@ class MonitorTest extends TestCase
                 )
                 ->has('trigger.data', 1, fn (AssertableInertia $page) => $page
                     ->where('value', Response::HTTP_INTERNAL_SERVER_ERROR)
-                    ->where('type', TriggerType::HTTP_STATUS_CODE->name)
-                    ->where('operator', Operator::EQUALS->value)
+                    ->where('type', TriggerType::HTTP_STATUS_CODE->getLabel())
+                    ->where('operator', Operator::EQUALS->getLabel())
                     ->etc()
                 )
             );
     }
-
-    public function test_user_can_view_monitor_with_non_displayed_recent_checks(): void
-    {
-        $this->actingAs($this->user);
-
-        $monitor = $this->user->monitors()->create([
-            'name' => 'My Monitor',
-            'type' => ActionType::HTTP,
-            'url' => self::URL,
-            'method' => HttpMethod::GET,
-            'interval' => Interval::MINUTES_5,
-        ]);
-
-        $monitor->checks()->create([
-            'status_code' => Response::HTTP_INTERNAL_SERVER_ERROR,
-            'response_time' => 1000,
-            'response_body' => 'Internal Server Error',
-            'response_headers' => ['Content-Type' => 'text/html'],
-            'started_at' => now()->subMillis(500),
-            'finished_at' => now(),
-        ]);
-
-        $from = now()->subHour()->format('Y-m-d H:i:s');
-        $to = now()->subMinutes(30)->format('Y-m-d H:i:s');
-
-        $this->get("/monitor/$monitor->id?from=$from&to=$to")
-            ->assertInertia(fn (AssertableInertia $page) => $page
-                ->component('Monitor/Show')
-                ->has('checks.data', 0)
-            );
-    }
+    /**
+     * The following test is uncommented.
+     *
+     * Reason: atm, the monitor will always be delivered with the checks from the last hour.
+     * See: MonitorResource::class
+     *
+     * Reintroduce this test after introduce the feature of scrolling trough the timeline.
+     */
+    //    public function test_user_can_view_monitor_with_non_displayed_recent_checks(): void
+    //    {
+    //        $this->actingAs($this->user);
+    //
+    //        $monitor = $this->user->monitors()->create([
+    //            'name' => 'My Monitor',
+    //            'type' => ActionType::HTTP,
+    //            'url' => self::URL,
+    //            'method' => HttpMethod::GET,
+    //            'interval' => Interval::MINUTES_5,
+    //        ]);
+    //
+    //        $monitor->checks()->create([
+    //            'status_code' => Response::HTTP_INTERNAL_SERVER_ERROR,
+    //            'response_time' => 1000,
+    //            'response_body' => 'Internal Server Error',
+    //            'response_headers' => ['Content-Type' => 'text/html'],
+    //            'started_at' => now()->subMillis(500),
+    //            'finished_at' => now(),
+    //        ]);
+    //
+    //        $from = now()->subHour()->format('Y-m-d H:i:s');
+    //        $to = now()->subMinutes(30)->format('Y-m-d H:i:s');
+    //
+    //        $this->get("/monitor/$monitor->id?from=$from&to=$to")
+    //            ->assertInertia(fn (AssertableInertia $page) => $page
+    //                ->component('Monitor/Show')
+    //                ->has('monitor.data.checks', 0)
+    //            );
+    //    }
 
     public function test_user_can_view_monitor_with_only_recent_checks(): void
     {
@@ -197,7 +204,7 @@ class MonitorTest extends TestCase
         $this->get("/monitor/$monitor->id?from=$from&to=$to")
             ->assertInertia(fn (AssertableInertia $page) => $page
                 ->component('Monitor/Show')
-                ->has('checks.data', 2)
+                ->has('monitor.data.checks', 2)
             );
     }
 

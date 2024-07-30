@@ -14,7 +14,7 @@ class MonitorPassableDTO
     public Check $check;
 
     public function __construct(
-        readonly Monitor $monitor,
+        public Monitor $monitor,
     ) {
     }
 

@@ -11,11 +11,16 @@ class UpdateMonitor
 
     public function handle(
         Monitor $monitor,
+        ?string $name,
         ?string $method,
         ?int $interval
     ): Monitor {
 
         $data = [];
+
+        if ($name) {
+            $data['name'] = $name;
+        }
 
         if ($method) {
             $data['method'] = $method;

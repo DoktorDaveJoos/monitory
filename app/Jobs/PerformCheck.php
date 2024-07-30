@@ -46,6 +46,8 @@ class PerformCheck implements ShouldQueue
             ])
             ->thenReturn();
 
+        $result->monitor->update(['last_checked_at' => now()]);
+
         Log::debug('Check performed', [
             'monitor_id' => $this->monitorId,
             'result' => $result,

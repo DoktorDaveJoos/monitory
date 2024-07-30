@@ -21,6 +21,10 @@ class MonitorPolicy
      */
     public function view(User $user, Monitor $monitor): bool
     {
+        if ($user->id !== $monitor->user_id) {
+            abort(404);
+        }
+
         return $user->id === $monitor->user_id;
     }
 

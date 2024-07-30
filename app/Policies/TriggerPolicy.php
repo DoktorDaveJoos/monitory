@@ -21,6 +21,10 @@ class TriggerPolicy
      */
     public function view(User $user, Trigger $trigger): bool
     {
+        if ($user->id !== $trigger->monitor->user_id) {
+            abort(404);
+        }
+
         return $user->id === $trigger->monitor->user_id;
     }
 
@@ -49,6 +53,10 @@ class TriggerPolicy
      */
     public function delete(User $user, Trigger $trigger): bool
     {
+        if ($user->id !== $trigger->monitor->user_id) {
+            abort(404);
+        }
+
         return $user->id === $trigger->monitor->user_id;
     }
 
