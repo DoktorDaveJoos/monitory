@@ -183,8 +183,8 @@ watch(props, () => {
             :class="
                 cn(
                     'max-h-24',
-                    options.size === 'large' && 'max-h-32 pr-2',
-                    options.size === 'small' && 'max-h-20 pr-2',
+                    options.size === 'large' && 'max-h-32 pr-4',
+                    options.size === 'small' && 'max-h-20 pr-4',
                 )
             "
             :id="myId"
