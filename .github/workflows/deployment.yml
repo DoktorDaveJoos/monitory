@@ -79,12 +79,9 @@ jobs:
 
       - name: Deploy Staging Site to Forge
         run: |
-          echo ${{ env.FORGE_SERVER_NAME }} &&
           composer global require laravel/forge-cli
-          forge server:switch $FORGE_SERVER_NAME
-          forge deploy $FORGE_SITE_NAME
+          forge server:switch ${{ vars.FORGE_STAGING_SERVER_NAME }}
+          forge deploy ${{ vars.FORGE_STAGING_SITE_NAME }}
         env:
           FORGE_API_TOKEN: ${{ secrets.FORGE_API_TOKEN }}
-          FORGE_SERVER_NAME: ${{ vars.FORGE_SERVER_NAME }}
-          FORGE_SITE_NAME: ${{ vars.FORGE_SITE_NAME }}
         if: success() && env.ENV == 'staging'
