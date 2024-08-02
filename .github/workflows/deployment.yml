@@ -69,7 +69,7 @@ jobs:
         if: success() && env.ENV == 'production' && github.ref_type == 'tag'
       - name: Deploy Staging Site to Forge
         run: |
-          echo ${{ vars.FORGE_SERVER_NAME }} && echo ${{ vars.FORGE_SITE_NAME }} &&
+          echo $FORGE_SERVER_NAME && echo $FORGE_SITE_NAME &&
           composer global require laravel/forge-cli
           forge server:switch ${{ env.FORGE_SERVER_NAME }}
           forge deploy ${{ env.FORGE_SITE_NAME }}
