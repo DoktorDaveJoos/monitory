@@ -27,7 +27,7 @@ jobs:
       - name: Set environment (staging)
         if: endsWith(github.ref, '/staging')
         run: |
-          echo "ENV=development" >> $GITHUB_ENV
+          echo "ENV=staging" >> $GITHUB_ENV
       - name: Set environment (production)
         if: endsWith(github.ref, '/main') || github.ref_type == 'tag'
         run: |
@@ -58,16 +58,16 @@ jobs:
       - name: Deploy Production Site to Forge
         run: |
           composer global require laravel/forge-cli
-          forge server:switch ${{ vars.FORGE_PROD_SERVER_NAME }}
-          forge deploy ${{ vars.FORGE_PROD_SITE_NAME }}
+          forge server:switch ${{ vars.FORGE_SERVER_NAME }}
+          forge deploy ${{ vars.FORGE_SITE_NAME }}
         env:
           FORGE_API_TOKEN: ${{ secrets.FORGE_API_TOKEN }}
         if: success() && env.ENV == 'production' && github.ref_type == 'tag'
       - name: Deploy Staging Site to Forge
         run: |
           composer global require laravel/forge-cli
-          forge server:switch ${{ vars.FORGE_STAGING_SERVER_NAME }}
-          forge deploy ${{ vars.FORGE_STAGING_SITE_NAME }}
+          forge server:switch ${{ env.FORGE_SERVER_NAME }}
+          forge deploy ${{ env.FORGE_SITE_NAME }}
         env:
           FORGE_API_TOKEN: ${{ secrets.FORGE_API_TOKEN }}
         if: success() && env.ENV == 'staging'
