@@ -24,6 +24,7 @@ class UpdateMonitorRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'name' => ['string', 'max:255'],
             'method' => ['string', 'in:GET,POST,PUT,DELETE'],
             'interval' => ['integer', 'in:1,5', new IntervalLimit],
         ];

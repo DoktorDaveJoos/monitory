@@ -18,7 +18,7 @@ import Toaster from '@/Components/ui/toast/Toaster.vue';
 const collapsed = ref(false);
 
 const hasMonitors = computed(() => {
-    return usePage().props.monitor_list.data.length > 0;
+    return usePage().props.monitor_list.data?.length > 0;
 });
 </script>
 

@@ -12,11 +12,13 @@ import {
 } from '@/types';
 import {
     CircleAlert,
+    EllipsisVertical,
     ExternalLink,
     Monitor as MonitorIcon,
     PlugZap,
     Plus,
     Trash2,
+    Flame,
 } from 'lucide-vue-next';
 import LayoutHeader from '@/Components/LayoutHeader.vue';
 import { ref, watch } from 'vue';
@@ -46,6 +48,14 @@ import {
     SelectValue,
 } from '@/Components/ui/select';
 import { Alert, AlertDescription, AlertTitle } from '@/Components/ui/alert';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/Components/ui/dropdown-menu';
 
 const props = defineProps<{
     monitor: ResourceItem<Monitor>;
@@ -174,77 +184,103 @@ watch(
         </template>
         <template #actions>
             <div class="flex">
-                <Dialog
-                    v-model:open="confirmingMonitorDeletion"
-                    :default-open="false"
-                >
-                    <DialogTrigger as-child>
-                        <Button variant="destructive">
-                            Delete
-                            <Trash2 class="w-4 h-4 shrink-0 ml-1" />
-                        </Button>
-                    </DialogTrigger>
-                    <DialogContent class="sm:max-w-[425px]">
-                        <DialogHeader>
-                            <DialogTitle
-                                >Are you sure you want to delete your monitor?
-                            </DialogTitle>
-                            <DialogDescription>
-                                Once your monitor is deleted, all of its
-                                resources and data will be permanently deleted.
-                                Please enter your password to confirm you would
-                                like to permanently delete your monitor.
-                            </DialogDescription>
-                        </DialogHeader>
-                        <div class="grid gap-4 py-4">
-                            <div class="items-center gap-4">
-                                <Label class="text-right"> Name </Label>
-                                <div
-                                    class="font-mono px-4 mb-4 py-2 rounded-lg bg-foreground text-background"
-                                >
-                                    {{ monitor.data.name }}
-                                </div>
-                                <Label
-                                    :for="`name-confirmation-${monitor.data.id}`"
-                                    class="text-right"
-                                >
-                                    Repeat the monitor name to confirm
-                                </Label>
-                                <Input
-                                    :id="`name-confirmation-${monitor.data.id}`"
-                                    v-model="nameConfirmation"
-                                    class="col-span-3"
-                                />
-                                <InputError message="" class="mt-2" />
-                            </div>
-                        </div>
-                        <DialogFooter>
-                            <Button
-                                variant="destructive"
-                                :disabled="
-                                    nameConfirmation !== monitor.data.name
-                                "
-                                @click="deleteMonitor"
-                            >
-                                Delete Monitor
-                            </Button>
-                        </DialogFooter>
-                    </DialogContent>
-                </Dialog>
+                <DropdownMenu>
+                    <DropdownMenuTrigger>
+                        <EllipsisVertical class="w-4 h-4" />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                        <DropdownMenuLabel>Options</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem :disabled="true">
+                            Pause Monitor</DropdownMenuItem
+                        >
+                        <DropdownMenuItem
+                            @click="confirmingMonitorDeletion = true"
+                        >
+                            Delete Monitor</DropdownMenuItem
+                        >
+                    </DropdownMenuContent>
+                </DropdownMenu>
             </div>
+            <Dialog
+                v-model:open="confirmingMonitorDeletion"
+                :default-open="false"
+            >
+                <DialogContent class="sm:max-w-[425px]">
+                    <DialogHeader>
+                        <DialogTitle
+                            >Are you sure you want to delete your monitor?
+                        </DialogTitle>
+                        <DialogDescription>
+                            Once your monitor is deleted, all of its resources
+                            and data will be permanently deleted. Please enter
+                            your password to confirm you would like to
+                            permanently delete your monitor.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div class="grid gap-4 py-4">
+                        <div class="items-center gap-4">
+                            <Label class="text-right"> Name </Label>
+                            <div
+                                class="font-mono px-4 mb-4 py-2 rounded-lg bg-foreground text-background"
+                            >
+                                {{ monitor.data.name }}
+                            </div>
+                            <Label
+                                :for="`name-confirmation-${monitor.data.id}`"
+                                class="text-right"
+                            >
+                                Repeat the monitor name to confirm
+                            </Label>
+                            <Input
+                                :id="`name-confirmation-${monitor.data.id}`"
+                                v-model="nameConfirmation"
+                                class="col-span-3"
+                            />
+                            <InputError message="" class="mt-2" />
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button
+                            variant="destructive"
+                            :disabled="nameConfirmation !== monitor.data.name"
+                            @click="deleteMonitor"
+                        >
+                            Delete Monitor
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </template>
 
         <div class="max-w-7xl mx-auto w-full">
             <Alert
                 v-if="trigger.data.length === 0"
-                variant="destructive"
+                variant="default"
                 class="mb-6"
             >
-                <CircleAlert class="w-4 h-4" />
-                <AlertTitle>Missing Trigger</AlertTitle>
+                <Flame class="w-5 h-5 mr-2" />
+                <AlertTitle>You made it!</AlertTitle>
                 <AlertDescription>
-                    You don't have any triggers setup to notify you when your
-                    monitor fails.
+                    Your monitor is up and running! 🚀
+
+                    <br />
+
+                    Make sure to setup your notification triggers to get
+                    notified when your monitor fails.
+
+                    <br />
+                    <br />
+
+                    <Button
+                        size="xs"
+                        class="text-xs"
+                        variant="secondary"
+                        @click="createTriggerDialog = true"
+                    >
+                        Create notification trigger
+                        <Plus class="w-4 h-4 shrink-0 ml-1" />
+                    </Button>
                 </AlertDescription>
             </Alert>
 
@@ -256,7 +292,7 @@ watch(
                     :check_labels="check_labels"
                     :options="{
                         size: 'large',
-                        fading: true,
+                        fading: false,
                         show_x_ticks: true,
                     }"
                 />
@@ -301,7 +337,7 @@ watch(
                 </div>
             </Card>
 
-            <div class="grid md:grid-cols-2 gap-4 mt-8">
+            <div class="grid xl:grid-cols-2 gap-4 mt-8">
                 <div class="space-y-2">
                     <Label>Settings</Label>
                     <Card class="flex justify-between items-center px-4 h-14">
@@ -349,20 +385,23 @@ watch(
                         v-for="_trigger in trigger.data"
                         class="flex justify-between items-center px-4 h-14"
                     >
-                        <div class="flex items-center space-x-2">
+                        <div class="flex items-center space-x-2 max-w-full">
                             <CircleAlert
                                 class="w-5 h-5 text-destructive shrink-0"
                             />
                             <span
-                                class="font-light text-xs text-primary-foreground/50 uppercase"
+                                class="font-light text-xs text-primary-foreground/50 uppercase truncate"
                                 >When</span
                             >
-                            <Label>{{ _trigger.type }}</Label>
-                            <span
-                                class="font-light text-xs text-primary-foreground/50 uppercase"
-                                >{{ _trigger.operator }}</span
+                            <Label class="truncate">{{ _trigger.type }}</Label>
+                            <div
+                                class="font-light text-xs text-primary-foreground/50 uppercase truncate"
                             >
-                            <Label>{{ _trigger.value.toString() }}</Label>
+                                {{ _trigger.operator }}
+                            </div>
+                            <Label class="truncate">{{
+                                _trigger.value.toString()
+                            }}</Label>
                         </div>
                         <button @click="deleteTrigger(_trigger.id)">
                             <Trash2 class="w-5 h-5 text-destructive shrink-0" />
@@ -381,7 +420,7 @@ watch(
                                     class="text-primary uppercase text-xs font-bold tracking-widest"
                                     >{{
                                         trigger.data.length === 0
-                                            ? 'Create Trigger'
+                                            ? 'Create Notification Trigger'
                                             : 'More'
                                     }}</span
                                 >

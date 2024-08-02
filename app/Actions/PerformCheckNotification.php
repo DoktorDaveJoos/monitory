@@ -41,6 +41,8 @@ class PerformCheckNotification
                 )
             );
 
+            $monitorPassableDTO->monitor->increment('alert_count');
+
             return $next($monitorPassableDTO);
         }
 

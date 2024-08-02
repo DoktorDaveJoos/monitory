@@ -1,12 +1,14 @@
 <script setup lang="ts">
+import { Label } from '@/Components/ui/label';
+
 defineProps<{
     value?: string;
 }>();
 </script>
 
 <template>
-    <label class="block font-medium text-sm text-gray-700 dark:text-gray-300">
+    <Label>
         <span v-if="value">{{ value }}</span>
         <span v-else><slot /></span>
-    </label>
+    </Label>
 </template>
