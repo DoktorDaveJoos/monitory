@@ -88,6 +88,13 @@ const submit = () => {
                         Forgot your password?
                     </Link>
 
+                    <Link
+                        :href="route('register')"
+                        class="underline ms-4 text-sm text-foreground/80 dark:text-gray-400 hover:text-foreground dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800"
+                    >
+                        Register
+                    </Link>
+
                     <Button class="ms-4" :disabled="form.processing">
                         Log in
                     </Button>

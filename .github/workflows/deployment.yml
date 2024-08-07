@@ -71,8 +71,8 @@ jobs:
       - name: Deploy Production Site to Forge
         run: |
           composer global require laravel/forge-cli
-          forge server:switch ${{ vars.FORGE_SERVER_NAME }}
-          forge deploy ${{ vars.FORGE_SITE_NAME }}
+          forge server:switch ${{ vars.FORGE_PROD_SERVER_NAME }}
+          forge deploy ${{ vars.FORGE_PROD_SITE_NAME }}
         env:
           FORGE_API_TOKEN: ${{ secrets.FORGE_API_TOKEN }}
         if: success() && env.ENV == 'production' && github.ref_type == 'tag'
