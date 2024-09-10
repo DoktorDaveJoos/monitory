@@ -524,4 +524,49 @@ class MonitorTest extends TestCase
             'auth_token' => 'token',
         ]);
     }
+
+    public function test_monitor_with_same_url_can_be_created_by_different_users(): void
+    {
+        $this->actingAs($this->user);
+
+        $response = $this->post('/monitor', [
+            'name' => 'My Monitor',
+            'type' => ActionType::HTTP->value,
+            'url' => self::URL,
+            'method' => HttpMethod::GET->value,
+            'interval' => Interval::MINUTES_5->value,
+        ]);
+
+        // Inertia redirects to the monitors index page
+        $response->assertStatus(302);
+
+        $this->assertDatabaseHas('monitors', [
+            'name' => 'My Monitor',
+            'type' => ActionType::HTTP,
+            'url' => self::URL,
+            'method' => HttpMethod::GET,
+            'interval' => Interval::MINUTES_5,
+        ]);
+
+        $this->actingAs(User::factory()->create());
+
+        $response = $this->post('/monitor', [
+            'name' => 'My Monitor',
+            'type' => ActionType::HTTP->value,
+            'url' => self::URL,
+            'method' => HttpMethod::GET->value,
+            'interval' => Interval::MINUTES_5->value,
+        ]);
+
+        // Inertia redirects to the monitors index page
+        $response->assertStatus(302);
+
+        $this->assertDatabaseHas('monitors', [
+            'name' => 'My Monitor',
+            'type' => ActionType::HTTP,
+            'url' => self::URL,
+            'method' => HttpMethod::GET,
+            'interval' => Interval::MINUTES_5,
+        ]);
+    }
 }
