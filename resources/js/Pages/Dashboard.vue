@@ -51,10 +51,10 @@ const form = useForm({
     method: '',
     type: '',
     url: '',
-    auth: null,
-    auth_username: null,
-    auth_password: null,
-    auth_token: null,
+    auth: '',
+    auth_username: '',
+    auth_password: '',
+    auth_token: '',
 });
 const connection = ref<boolean | null>(null);
 const showAuth = ref<boolean>(false);
@@ -219,7 +219,7 @@ const handleAuthSwitch = (value: boolean) => {
                                 <div class="flex items-center space-x-2 mt-4">
                                     <Switch
                                         id="show-auth"
-                                        :value="showAuth"
+                                        :value="showAuth.toString()"
                                         @update:checked="handleAuthSwitch"
                                     />
                                     <Label for="show-auth"
