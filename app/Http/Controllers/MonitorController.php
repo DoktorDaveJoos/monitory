@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Actions\StoreMonitor;
 use App\Actions\UpdateMonitor;
-use App\Enums\AuthType;
 use App\Enums\HttpStatusCode;
 use App\Enums\Operator;
 use App\Enums\TriggerType;

@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\AuthType;
-use App\Http\Resources\EnumOptionResource;
 use App\Http\Resources\MonitorResource;
 use App\Models\Check;
 use Illuminate\Http\Request;
