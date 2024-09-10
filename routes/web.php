@@ -4,11 +4,21 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MonitorController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TriggerController;
+use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return redirect('/login');
 });
+
+// For testing purposes only
+if (! app()->environment('production')) {
+    // Endpoint for testing basic auth
+    Route::get('/test/basic-auth', function () {
+        // return ok
+        return Response::make();
+    })->middleware('auth.basic');
+}
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -28,7 +38,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::post('/monitor/{monitor}/trigger', [TriggerController::class, 'store'])->name('trigger.store');
     Route::delete('/monitor/{monitor}/trigger/{trigger}', [TriggerController::class, 'destroy'])->name('trigger.destroy');
-
 });
 
 require __DIR__.'/auth.php';
