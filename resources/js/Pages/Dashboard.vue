@@ -93,6 +93,7 @@ const resetAuth = () => {
 const handleAuthSwitch = (value: boolean) => {
     if (!value) {
         resetAuth();
+        form.reset('auth');
     }
 
     showAuth.value = value;
