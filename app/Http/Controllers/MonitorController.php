@@ -37,7 +37,11 @@ class MonitorController extends Controller
             type: $request->validated('type'),
             url: $request->validated('url'),
             method: $request->validated('method'),
-            interval: $request->validated('interval')
+            interval: $request->validated('interval'),
+            auth: $request->validated('auth'),
+            auth_username: $request->validated('auth_username'),
+            auth_password: $request->validated('auth_password'),
+            auth_token: $request->validated('auth_token'),
         );
 
         return to_route('monitor.show', $monitor->id);

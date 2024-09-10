@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\AuthType;
 use App\Rules\IntervalLimit;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -29,6 +30,10 @@ class StoreMonitorRequest extends FormRequest
             'url' => ['required', 'url:http,https'],
             'method' => ['required', 'string', 'in:GET,POST,PUT,DELETE'],
             'interval' => ['required', 'integer', new IntervalLimit],
+            'auth' => ['nullable', 'string', 'in:' . implode(',', AuthType::values())],
+            'auth_username' => ['nullable', 'string'],
+            'auth_password' => ['nullable', 'string'],
+            'auth_token' => ['nullable', 'string'],
         ];
     }
 }

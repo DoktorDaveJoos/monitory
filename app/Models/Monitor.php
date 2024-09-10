@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\ActionType;
+use App\Enums\AuthType;
 use App\Enums\HttpMethod;
 use App\Enums\Interval;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -22,6 +23,10 @@ use Illuminate\Support\Collection;
  * @property bool active
  * @property int alert_count
  * @property bool success
+ * @property AuthType auth
+ * @property string auth_username
+ * @property string auth_password
+ * @property string auth_token
  * @property string last_checked_at
  * @property User user
  * @property Collection<Check> checks
@@ -47,6 +52,10 @@ class Monitor extends Model
         'active',
         'method',
         'success',
+        'auth',
+        'auth_username',
+        'auth_password',
+        'auth_token',
         'last_checked_at',
     ];
 
@@ -56,6 +65,7 @@ class Monitor extends Model
         'active' => 'boolean',
         'last_checked_at' => 'datetime',
         'interval' => Interval::class,
+        'auth' => AuthType::class,
     ];
 
     public function scopeActive($query)

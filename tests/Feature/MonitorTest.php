@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Enums\ActionType;
+use App\Enums\AuthType;
 use App\Enums\HttpMethod;
 use App\Enums\Interval;
 use App\Enums\Operator;
@@ -436,5 +437,91 @@ class MonitorTest extends TestCase
         $response = $this->get("/monitor/$monitor->id");
 
         $response->assertNotFound();
+    }
+
+    public function test_monitor_can_created_with_basic_auth(): void
+    {
+        $this->actingAs($this->user);
+
+        $response = $this->post('/monitor', [
+            'name' => 'My Monitor',
+            'type' => ActionType::HTTP->value,
+            'url' => self::URL,
+            'method' => HttpMethod::GET->value,
+            'interval' => Interval::MINUTES_5->value,
+            'auth' => AuthType::BASIC->value,
+            'auth_username' => 'username',
+            'auth_password' => 'password',
+        ]);
+
+        // Inertia redirects to the monitors index page
+        $response->assertStatus(302);
+
+        $this->assertDatabaseHas('monitors', [
+            'name' => 'My Monitor',
+            'type' => ActionType::HTTP,
+            'url' => self::URL,
+            'method' => HttpMethod::GET,
+            'interval' => Interval::MINUTES_5,
+            'auth' => 'basic_auth',
+            'auth_username' => 'username',
+            'auth_password' => 'password',
+        ]);
+    }
+
+    public function test_monitor_can_created_with_bearer_token_auth(): void
+    {
+        $this->actingAs($this->user);
+
+        $response = $this->post('/monitor', [
+            'name' => 'My Monitor',
+            'type' => ActionType::HTTP->value,
+            'url' => self::URL,
+            'method' => HttpMethod::GET->value,
+            'interval' => Interval::MINUTES_5->value,
+            'auth' => AuthType::BEARER->value,
+            'auth_token' => 'token',
+        ]);
+
+        // Inertia redirects to the monitors index page
+        $response->assertStatus(302);
+
+        $this->assertDatabaseHas('monitors', [
+            'name' => 'My Monitor',
+            'type' => ActionType::HTTP,
+            'url' => self::URL,
+            'method' => HttpMethod::GET,
+            'interval' => Interval::MINUTES_5,
+            'auth' => 'bearer_token',
+            'auth_token' => 'token',
+        ]);
+    }
+
+    public function test_monitor_can_created_with_digest_auth(): void
+    {
+        $this->actingAs($this->user);
+
+        $response = $this->post('/monitor', [
+            'name' => 'My Monitor',
+            'type' => ActionType::HTTP->value,
+            'url' => self::URL,
+            'method' => HttpMethod::GET->value,
+            'interval' => Interval::MINUTES_5->value,
+            'auth' => AuthType::DIGEST->value,
+            'auth_token' => 'token',
+        ]);
+
+        // Inertia redirects to the monitors index page
+        $response->assertStatus(302);
+
+        $this->assertDatabaseHas('monitors', [
+            'name' => 'My Monitor',
+            'type' => ActionType::HTTP,
+            'url' => self::URL,
+            'method' => HttpMethod::GET,
+            'interval' => Interval::MINUTES_5,
+            'auth' => 'digest_auth',
+            'auth_token' => 'token',
+        ]);
     }
 }

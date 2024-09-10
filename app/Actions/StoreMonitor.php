@@ -16,7 +16,11 @@ class StoreMonitor
         string $type,
         string $url,
         string $method,
-        int $interval
+        int $interval,
+        ?string $auth,
+        ?string $auth_username,
+        ?string $auth_password,
+        ?string $auth_token,
     ): Monitor {
         return $user->monitors()->create([
             'name' => $name,
@@ -24,6 +28,10 @@ class StoreMonitor
             'url' => $url,
             'method' => $method,
             'interval' => $interval,
+            'auth' => $auth,
+            'auth_username' => $auth_username,
+            'auth_password' => $auth_password,
+            'auth_token' => $auth_token,
         ]);
     }
 }
