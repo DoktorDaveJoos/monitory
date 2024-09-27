@@ -569,4 +569,29 @@ class MonitorTest extends TestCase
             'interval' => Interval::MINUTES_5,
         ]);
     }
+
+    public function test_monitor_with_type_ping_can_be_stored(): void
+    {
+        $this->actingAs($this->user);
+
+        $this->post('/monitor', [
+            'name' => 'My Monitor',
+            'type' => ActionType::PING->value,
+            'host' => '192.168.1.1',
+            'interval' => Interval::MINUTES_5->value,
+        ])->assertRedirect();
+    }
+
+    public function test_monitor_with_type_ping_cannot_be_stored_without_host(): void
+    {
+        $this->actingAs($this->user);
+
+        $response = $this->post('/monitor', [
+            'name' => 'My Monitor',
+            'type' => ActionType::PING->value,
+            'interval' => Interval::MINUTES_5->value,
+        ]);
+
+        dd($response->getContent());
+    }
 }

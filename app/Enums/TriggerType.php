@@ -18,7 +18,7 @@ enum TriggerType: string
     //    case IMAP = 'imap';
     //    case TCP = 'tcp';
     //    case UDP = 'udp';
-    //    case PING = 'ping';
+    case PING = 'ping';
     //    case SSH = 'ssh';
     //    case SNMP = 'snmp';
     //    case FTP = 'ftp';
@@ -27,11 +27,17 @@ enum TriggerType: string
     //    case TELNET = 'telnet';
     //    case CUSTOM = 'custom';
 
+    public static function values(): array
+    {
+        return array_column(self::cases(), 'value');
+    }
+
     public function getLabel(): string
     {
         return match ($this) {
             self::HTTP_STATUS_CODE => 'HTTP Status Code',
             self::LATENCY => 'Latency',
+            self::PING => 'Ping',
             //            self::SSL => 'SSL',
             //            self::MIXED_CONTENT => 'Mixed Content',
             //            self::CERTIFICATE_EXPIRY => 'Certificate Expiry',
@@ -53,10 +59,5 @@ enum TriggerType: string
             //            self::TELNET => 'Telnet',
             //            self::CUSTOM => 'Custom',
         };
-    }
-
-    public static function values(): array
-    {
-        return array_column(self::cases(), 'value');
     }
 }

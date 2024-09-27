@@ -60,7 +60,10 @@ class PerformCheckValidation
         return match ($trigger->type) {
             TriggerType::HTTP_STATUS_CODE => self::compare($check->status_code, $trigger->operator, $trigger->value),
             TriggerType::LATENCY => self::compare($check->response_time, $trigger->operator, $trigger->value),
-            default => false,
+            // Ping only offers a binary value - 1 if the server is reachable, 0 if not
+            // So we only need to check if the value is equal to 0 - meaning the server is not reachable
+            // If the server is not reachable, we trigger the alert
+            TriggerType::PING => self::compare($check->value, Operator::EQUALS, 0),
         };
     }
 

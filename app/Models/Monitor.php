@@ -46,6 +46,7 @@ class Monitor extends Model
         'name',
         'type',
         'url',
+        'host',
         'expected_status_code',
         'interval',
         'timeout',
