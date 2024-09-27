@@ -592,6 +592,45 @@ class MonitorTest extends TestCase
             'interval' => Interval::MINUTES_5->value,
         ]);
 
-        dd($response->getContent());
+        $response->assertSessionHasErrors('host');
+
+        $this->assertDatabaseMissing('monitors', [
+            'name' => 'My Monitor',
+        ]);
+    }
+
+    public function test_monitor_with_type_ping_cannot_be_stored_with_url(): void
+    {
+        $this->actingAs($this->user);
+
+        $response = $this->post('/monitor', [
+            'name' => 'My Monitor',
+            'type' => ActionType::PING->value,
+            'url' => self::URL,
+            'interval' => Interval::MINUTES_5->value,
+        ]);
+
+        $response->assertSessionHasErrors('host');
+
+        $this->assertDatabaseMissing('monitors', [
+            'name' => 'My Monitor',
+        ]);
+    }
+
+    public function test_monitor_with_type_http_requires_url(): void
+    {
+        $this->actingAs($this->user);
+
+        $response = $this->post('/monitor', [
+            'name' => 'My Monitor',
+            'type' => ActionType::HTTP->value,
+            'interval' => Interval::MINUTES_5->value,
+        ]);
+
+        $response->assertSessionHasErrors('url');
+
+        $this->assertDatabaseMissing('monitors', [
+            'name' => 'My Monitor',
+        ]);
     }
 }

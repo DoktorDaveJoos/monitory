@@ -31,8 +31,6 @@ class MonitorController extends Controller
     {
         Gate::authorize('create', Monitor::class);
 
-        dd($request->validated());
-
         $monitor = StoreMonitor::run(
             user: $request->user(),
             name: $request->validated('name'),
