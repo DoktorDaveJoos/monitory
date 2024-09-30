@@ -22,7 +22,7 @@ class PingMonitorStrategy implements MonitorStrategy
     {
         return new self(
             monitor_id: $attributes['id'],
-            host: $attributes['url'],
+            host: $attributes['host'],
         );
     }
 

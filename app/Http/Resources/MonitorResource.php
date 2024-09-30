@@ -22,6 +22,7 @@ class MonitorResource extends JsonResource
         return [
             'id' => $this->id,
             'url' => $this->url,
+            'host' => $this->host,
             'name' => $this->name,
             'method' => $this->method,
             'type' => $this->type,

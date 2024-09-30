@@ -19,6 +19,7 @@ use Illuminate\Support\Collection;
  * @property string name
  * @property ActionType type
  * @property string url
+ * @property string host
  * @property int interval
  * @property bool active
  * @property int alert_count

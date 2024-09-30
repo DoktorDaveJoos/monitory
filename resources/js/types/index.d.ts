@@ -6,6 +6,10 @@ export interface ResourceItem<T> {
     data: T;
 }
 
+export interface OperatorsCollection {
+    data: Array<Record<string, ResourceItem<OptionEnum>>>;
+}
+
 export interface User {
     id: number;
     name: string;
@@ -79,6 +83,7 @@ export interface MonitorStats {
 export interface OptionEnum {
     value: string;
     label: string;
+    unit: string;
 }
 
 export type PageProps<

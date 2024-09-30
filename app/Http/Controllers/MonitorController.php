@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Actions\StoreMonitor;
 use App\Actions\UpdateMonitor;
+use App\Enums\ActionType;
 use App\Enums\HttpStatusCode;
 use App\Enums\Operator;
 use App\Enums\TriggerType;
@@ -11,6 +12,7 @@ use App\Http\Requests\StoreMonitorRequest;
 use App\Http\Requests\UpdateMonitorRequest;
 use App\Http\Resources\EnumOptionResource;
 use App\Http\Resources\MonitorResource;
+use App\Http\Resources\OperatorsResource;
 use App\Http\Resources\TriggerResource;
 use App\Models\Check;
 use App\Models\Monitor;
@@ -90,14 +92,18 @@ class MonitorController extends Controller
             ? $averageLatencyOverall / $averageLastHour
             : 0;
 
+        $triggers = TriggerType::casesForType($monitor->type);
+
         return inertia('Monitor/Show', [
             'monitor' => MonitorResource::make($monitor),
             'check_labels' => Check::labels($from, $to),
             'trigger' => TriggerResource::collection($monitor->triggers),
             'trigger_options' => [
-                'trigger_types' => EnumOptionResource::collection(TriggerType::cases()),
-                'operators' => EnumOptionResource::collection(Operator::cases()),
-                'http_status_codes' => EnumOptionResource::collection(HttpStatusCode::cases()),
+                'trigger_types' => EnumOptionResource::collection($triggers),
+                'operators' => OperatorsResource::collection($triggers),
+                'http_status_codes' => $monitor->type === ActionType::HTTP
+                        ? EnumOptionResource::collection(HttpStatusCode::cases())
+                        : [],
             ],
             'monitor_stats' => [
                 '2xx' => [

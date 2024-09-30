@@ -51,6 +51,7 @@ const form = useForm({
     method: '',
     type: '',
     url: '',
+    host: '',
     auth: '',
     auth_username: '',
     auth_password: '',
@@ -60,6 +61,19 @@ const connection = ref<boolean | null>(null);
 const showAuth = ref<boolean>(false);
 
 const submit = () => {
+    if (form.type === 'ping') {
+        delete form.url;
+        delete form.method;
+        delete form.auth;
+        delete form.auth_username;
+        delete form.auth_password;
+        delete form.auth_token;
+    }
+
+    if (form.type === 'http') {
+        delete form.host;
+    }
+
     form.post(route('monitor.store'), {
         onSuccess: () => {
             addMonitor.value = false;
@@ -124,6 +138,16 @@ const handleAuthSwitch = (value: boolean) => {
                         </DialogDescription>
                     </DialogHeader>
                     <div class="grid gap-4 grid-cols-2 mb-4">
+                        <div class="col-span-2">
+                            <Label for="monitor-name">Monitor Name</Label>
+                            <Input
+                                id="monitor-name"
+                                v-model="form.name"
+                                :error="form.errors.name"
+                            />
+                            <InputError :message="form.errors.name" />
+                        </div>
+
                         <div>
                             <Label for="monitor-type">Monitor Type</Label>
                             <Select v-model="form.type">
@@ -138,11 +162,15 @@ const handleAuthSwitch = (value: boolean) => {
                                         <SelectItem value="http">
                                             http / https
                                         </SelectItem>
+                                        <SelectItem value="ping">
+                                            ping
+                                        </SelectItem>
                                     </SelectGroup>
                                 </SelectContent>
                             </Select>
                             <InputError :message="form.errors.type" />
                         </div>
+
                         <div>
                             <Label for="interval">Interval</Label>
                             <Select v-model="form.interval">
@@ -166,6 +194,18 @@ const handleAuthSwitch = (value: boolean) => {
                             <InputError :message="form.errors.interval" />
                         </div>
 
+                        <template v-if="form.type === 'ping'">
+                            <div class="col-span-2">
+                                <Label for="monitor-url">HOST</Label>
+                                <Input
+                                    id="monitor-host"
+                                    v-model="form.host"
+                                    :error="form.errors.host"
+                                />
+                                <InputError :message="form.errors.host" />
+                            </div>
+                        </template>
+
                         <template v-if="form.type === 'http'">
                             <div class="col-span-2">
                                 <Label for="monitor-url">URL</Label>
@@ -175,15 +215,6 @@ const handleAuthSwitch = (value: boolean) => {
                                     :error="form.errors.url"
                                 />
                                 <InputError :message="form.errors.url" />
-                            </div>
-                            <div>
-                                <Label for="monitor-name">Monitor Name</Label>
-                                <Input
-                                    id="monitor-name"
-                                    v-model="form.name"
-                                    :error="form.errors.name"
-                                />
-                                <InputError :message="form.errors.name" />
                             </div>
                             <div>
                                 <Label for="monitor-method"
@@ -215,6 +246,7 @@ const handleAuthSwitch = (value: boolean) => {
                                 </Select>
                                 <InputError :message="form.errors.method" />
                             </div>
+                            <div></div>
                             <div>
                                 <div class="flex items-center space-x-2 mt-4">
                                     <Switch
@@ -371,6 +403,7 @@ const handleAuthSwitch = (value: boolean) => {
                             Unreachable
                         </div>
                         <Button
+                            v-if="form.type === 'http'"
                             variant="secondary"
                             :disabled="!form.url || isChecking"
                             @click="testConnection"
