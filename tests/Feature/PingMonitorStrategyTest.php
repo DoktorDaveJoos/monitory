@@ -33,7 +33,7 @@ class PingMonitorStrategyTest extends TestCase
         $monitor = Monitor::factory()->create([
             'user_id' => $this->user->id,
             'type' => ActionType::PING,
-            'url' => self::HOST,
+            'host' => self::HOST,
         ]);
 
         $strategy = PingMonitorStrategy::make(
@@ -61,7 +61,7 @@ class PingMonitorStrategyTest extends TestCase
         $monitor = Monitor::factory()->create([
             'user_id' => $this->user->id,
             'type' => ActionType::PING,
-            'url' => self::HOST,
+            'host' => self::HOST,
         ]);
 
         $strategy = PingMonitorStrategy::make(
@@ -95,7 +95,7 @@ class PingMonitorStrategyTest extends TestCase
         $monitor = Monitor::factory()->create([
             'user_id' => $this->user->id,
             'type' => ActionType::PING,
-            'url' => self::HOST,
+            'host' => self::HOST,
         ]);
 
         $strategy = PingMonitorStrategy::make(
@@ -126,7 +126,7 @@ class PingMonitorStrategyTest extends TestCase
         $monitor = Monitor::factory()->create([
             'user_id' => $this->user->id,
             'type' => ActionType::PING,
-            'url' => self::HOST,
+            'host' => self::HOST,
         ]);
 
         $strategy = PingMonitorStrategy::make(
