@@ -101,9 +101,6 @@ class MonitorController extends Controller
             'trigger_options' => [
                 'trigger_types' => EnumOptionResource::collection($triggers),
                 'operators' => OperatorsResource::collection($triggers),
-                'http_status_codes' => $monitor->type === ActionType::HTTP
-                        ? EnumOptionResource::collection(HttpStatusCode::cases())
-                        : [],
             ],
             'monitor_stats' => [
                 '2xx' => [

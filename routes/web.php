@@ -38,6 +38,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::post('/monitor/{monitor}/trigger', [TriggerController::class, 'store'])->name('trigger.store');
     Route::delete('/monitor/{monitor}/trigger/{trigger}', [TriggerController::class, 'destroy'])->name('trigger.destroy');
+
+    Route::get('/trigger/options', [TriggerController::class, 'listOptions'])->name('trigger.options');
 });
 
 require __DIR__.'/auth.php';

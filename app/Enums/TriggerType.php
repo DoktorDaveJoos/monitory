@@ -27,12 +27,21 @@ enum TriggerType: string
         };
     }
 
+    public function getOptions(): array
+    {
+        return match ($this) {
+            self::HTTP_STATUS_CODE => HttpStatusCode::cases(),
+            self::LATENCY => [],
+            self::PING => BoolOptions::cases(),
+        };
+    }
+
     public function getLabel(): string
     {
         return match ($this) {
             self::HTTP_STATUS_CODE => 'HTTP Status Code',
             self::LATENCY => 'Latency',
-            self::PING => 'Ping',
+            self::PING => 'Successful Ping',
         };
     }
 

@@ -5,9 +5,9 @@ import { Chart } from '@/Components/ui/chart';
 import {
     Monitor,
     MonitorStats as MonitorStatsType,
+    OperatorsCollection,
     OptionEnum,
     ResourceCollection,
-    OperatorsCollection,
     ResourceItem,
     Trigger,
 } from '@/types';
@@ -15,11 +15,11 @@ import {
     CircleAlert,
     EllipsisVertical,
     ExternalLink,
+    Flame,
     Monitor as MonitorIcon,
     PlugZap,
     Plus,
     Trash2,
-    Flame,
 } from 'lucide-vue-next';
 import LayoutHeader from '@/Components/LayoutHeader.vue';
 import { computed, ref, watch } from 'vue';
@@ -57,6 +57,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/Components/ui/dropdown-menu';
+import { watchDeep } from '@vueuse/core';
 
 const props = defineProps<{
     monitor: ResourceItem<Monitor>;
@@ -73,6 +74,7 @@ const props = defineProps<{
 const confirmingMonitorDeletion = ref(false);
 const nameConfirmation = ref('');
 const createTriggerDialog = ref(false);
+const options = ref([]);
 
 const monitorForm = useForm<{
     method: string;
@@ -96,6 +98,23 @@ watch(confirmingMonitorDeletion, (value) => {
     if (!value) {
         nameConfirmation.value = '';
     }
+});
+
+watchDeep(triggerForm, async () => {
+    if (!triggerForm.type) {
+        return;
+    }
+
+    const response = await axios.get(
+        route('trigger.options', {
+            monitor: props.monitor.data.id,
+            type: triggerForm.type,
+        }),
+    );
+
+    const { data } = response.data;
+
+    options.value = data;
 });
 
 const operators = computed(() => {
@@ -213,13 +232,13 @@ watch(
                         <DropdownMenuLabel>Options</DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem :disabled="true">
-                            Pause Monitor</DropdownMenuItem
-                        >
+                            Pause Monitor
+                        </DropdownMenuItem>
                         <DropdownMenuItem
                             @click="confirmingMonitorDeletion = true"
                         >
-                            Delete Monitor</DropdownMenuItem
-                        >
+                            Delete Monitor
+                        </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>
@@ -513,7 +532,7 @@ watch(
                                             <SelectValue
                                                 :placeholder="
                                                     operators.length === 0
-                                                        ? 'Is reachable'
+                                                        ? '-'
                                                         : 'Select a trigger operator'
                                                 "
                                             />
@@ -541,15 +560,12 @@ watch(
 
                                     <Label for="type"> Value </Label>
                                     <Select
-                                        v-if="
-                                            triggerForm.type ===
-                                            'http_status_code'
-                                        "
+                                        v-if="options.length > 0"
                                         v-model="triggerForm.value"
                                     >
                                         <SelectTrigger class="w-full">
                                             <SelectValue
-                                                placeholder="Select an HTTP status code"
+                                                placeholder="Select an Option"
                                             />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -558,13 +574,12 @@ watch(
                                                     >Options
                                                 </SelectLabel>
                                                 <SelectItem
-                                                    v-for="status_code in trigger_options
-                                                        .http_status_codes.data"
+                                                    v-for="option in options"
                                                     :value="
-                                                        status_code.value.toString()
+                                                        option.value.toString()
                                                     "
                                                 >
-                                                    {{ status_code.label }}
+                                                    {{ option.label }}
                                                 </SelectItem>
                                             </SelectGroup>
                                         </SelectContent>

@@ -28,26 +28,25 @@ class PingMonitorStrategy implements MonitorStrategy
 
     public function check(): Check
     {
-        $start = microtime(true);
+        $start = now();
 
         // Perform a Ping Request to a server
         $result = Process::run('ping -c 1 '.$this->host);
 
-        $end = microtime(true);
-
-        // In ms
-        $response_time = ($end - $start) * 1000;
-
         // Check if the server is reachable
         $isReachable = ! $result->failed()
             && Str::of($result->output())->contains('1 packets transmitted, 1 packets received, 0.0% packet loss');
+
+        $time = (int) Str::match('/time=([0-9.]+)\sms/', $result->output()) ?? null;
+
+        $end = now();
 
         Log::debug('Ping output: '.$result->output());
 
         return Check::create([
             'monitor_id' => $this->monitor_id,
             'status_code' => null,
-            'response_time' => (int) $response_time,
+            'response_time' => (int) $time,
             'response_body' => $result->output(),
             'value' => $isReachable ? 1 : 0,
             'response_headers' => null,

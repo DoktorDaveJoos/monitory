@@ -60,6 +60,37 @@ enum Operator: string
         return array_column(self::cases(), 'value');
     }
 
+    public static function casesForTriggers(array $triggers): array
+    {
+        $cases = collect();
+
+        foreach ($triggers as $trigger) {
+            $cases->push([$trigger => self::casesForTrigger($trigger)]);
+        }
+
+        return $cases
+            ->unique()
+            ->toArray();
+    }
+
+    public static function casesForTrigger(TriggerType $type): array
+    {
+        return match ($type) {
+            TriggerType::HTTP_STATUS_CODE, TriggerType::LATENCY => [
+                self::EQUALS,
+                self::NOT_EQUALS,
+                self::GREATER_THAN,
+                self::LESS_THAN,
+                self::GREATER_THAN_OR_EQUALS,
+                self::LESS_THAN_OR_EQUALS,
+            ],
+            TriggerType::PING => [
+                self::EQUALS,
+                self::NOT_EQUALS,
+            ],
+        };
+    }
+
     public function getLabel(): string
     {
         return match ($this) {
@@ -114,33 +145,5 @@ enum Operator: string
             self::IS_RESOURCE => 'Is Resource',
             self::IS_NOT_RESOURCE => 'Is Not Resource',
         };
-    }
-
-    public static function casesForTrigger(TriggerType $type): array
-    {
-        return match ($type) {
-            TriggerType::HTTP_STATUS_CODE, TriggerType::LATENCY => [
-                self::EQUALS,
-                self::NOT_EQUALS,
-                self::GREATER_THAN,
-                self::LESS_THAN,
-                self::GREATER_THAN_OR_EQUALS,
-                self::LESS_THAN_OR_EQUALS,
-            ],
-            TriggerType::PING => [
-            ],
-        };
-    }
-
-    public static function casesForTriggers(array $triggers): array{
-        $cases = collect();
-
-        foreach($triggers as $trigger){
-            $cases->push([$trigger => self::casesForTrigger($trigger)]);
-        }
-
-        return $cases
-            ->unique()
-            ->toArray();
     }
 }

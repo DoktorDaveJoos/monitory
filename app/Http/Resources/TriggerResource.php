@@ -21,7 +21,7 @@ class TriggerResource extends JsonResource
         return [
             'id' => $this->id,
             'type' => $this->type->getLabel(),
-            'operator' => $this->operator->getLabel(),
+            'operator' => $this->operator?->getLabel(),
             'value' => $this->value,
         ];
     }
