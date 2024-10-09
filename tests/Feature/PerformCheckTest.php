@@ -7,7 +7,6 @@ use App\Enums\HttpMethod;
 use App\Enums\Operator;
 use App\Enums\TriggerType;
 use App\Jobs\PerformCheck;
-use App\Models\Check;
 use App\Models\Monitor;
 use App\Models\Trigger;
 use App\Models\User;
@@ -34,7 +33,7 @@ class PerformCheckTest extends TestCase
         $this->actingAs($this->user);
     }
 
-    public function test_check_has_performed_and_triggered_an_alert(): void
+    public function test_check_has_performed_with_http_strat_and_triggered_an_alert(): void
     {
         Notification::fake();
 
@@ -64,6 +63,47 @@ class PerformCheckTest extends TestCase
         ]);
 
         Http::assertSentCount(1);
+
+        Notification::assertSentTo(
+            notifiable: [$monitor->user],
+            notification: TriggerAlert::class
+        );
+    }
+
+    public function test_check_has_performed_with_ping_strat_and_triggered_an_alert(): void
+    {
+        Notification::fake();
+
+        Process::fake([
+            '*' => Process::result(
+                output: 'PING google.de (142.250.185.195): 56 data bytes
+                        64 bytes from 142.250.185.195: icmp_seq=0 ttl=118 time=35.234 ms
+
+                        --- google.de ping statistics ---
+                        1 packets transmitted, 0 packets received, 100.0% packet loss',
+            ),
+        ]);
+
+        $monitor = Monitor::factory()
+            ->has(
+                Trigger::factory()
+                    ->state([
+                        'type' => TriggerType::PING,
+                        'value' => false,
+                        'operator' => Operator::EQUALS,
+                    ])
+            )->create([
+                'user_id' => $this->user->id,
+                'type' => ActionType::PING,
+                'host' => 'google.de',
+            ]);
+
+        (new PerformCheck($monitor->id))->handle();
+
+        $this->assertDatabaseHas('checks', [
+            'monitor_id' => $monitor->id,
+            'value' => 0,
+        ]);
 
         Notification::assertSentTo(
             notifiable: [$monitor->user],
@@ -124,6 +164,8 @@ class PerformCheckTest extends TestCase
                 Trigger::factory()
                     ->state([
                         'type' => TriggerType::PING,
+                        'value' => false,
+                        'operator' => Operator::EQUALS,
                     ])
             )->create([
                 'user_id' => $this->user->id,
@@ -131,7 +173,14 @@ class PerformCheckTest extends TestCase
                 'host' => 'google.de',
             ]);
 
+        (new PerformCheck($monitor->id))->handle();
 
+        $this->assertDatabaseHas('checks', [
+            'monitor_id' => $monitor->id,
+            'value' => 1,
+        ]);
+
+        Notification::assertNothingSent();
     }
 
     public function test_check_sends_recovery_notification(): void

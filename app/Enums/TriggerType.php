@@ -41,14 +41,14 @@ enum TriggerType: string
         return match ($this) {
             self::HTTP_STATUS_CODE => 'HTTP Status Code',
             self::LATENCY => 'Latency',
-            self::PING => 'Successful Ping',
+            self::PING => 'Ping Success',
         };
     }
 
-    public function getUnit(): string
+    public function getUnit(): ?string
     {
         return match ($this) {
-            self::HTTP_STATUS_CODE, self::PING => '',
+            self::HTTP_STATUS_CODE, self::PING => null, // No unit - due to fixed options
             self::LATENCY => 'ms',
         };
     }

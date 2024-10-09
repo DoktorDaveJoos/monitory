@@ -43,6 +43,8 @@ class MonitorTest extends TestCase
 
         $response = $this->get("/monitor/$monitor->id");
 
+//        dd($response);
+
         $response
             ->assertInertia(fn (AssertableInertia $page) => $page
                 ->component('Monitor/Show')

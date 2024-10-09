@@ -15,31 +15,26 @@ class IpOrHostTest extends TestCase
     public static function validIpOrHostProvider(): array
     {
         return [
-            // Valid IPv4 addresses
-            ['127.0.0.1'],
-            ['192.168.1.1'],
-            ['255.255.255.255'],
-            ['10.0.0.1'],
+            'valid ipv4 - Localhost' => ['127.0.0.1'],
+            'valid ipv4 - Private Network' => ['192.168.1.1'],
+            'valid ipv4 - Broadcast' => ['255.255.255.255'],
+            'valid ipv4 - Class A' => ['10.0.0.1'],
 
-            // Valid IPv6 addresses
-            ['::1'],
-            ['2001:0db8:85a3:0000:0000:8a2e:0370:7334'],
-            ['fe80::1ff:fe23:4567:890a'],
-            ['::ffff:192.168.1.1'],
+            'valid ipv6 - Localhost' => ['::1'],
+            'valid ipv6 - Global Unicast' => ['2001:0db8:85a3:0000:0000:8a2e:0370:7334'],
+            'valid ipv6 - Link-Local' => ['fe80::1ff:fe23:4567:890a'],
+            'valid ipv6 - ipv4-mapped' => ['::ffff:192.168.1.1'],
 
-            // Valid hostnames
-            ['example.com'],
-            ['sub.example.com'],
-            ['my-site.org'],
-            ['myapp.local'],
-            ['host-with-dash.com'],
+            'valid Hostname - Simple' => ['example.com'],
+            'valid Hostname - Subdomain' => ['sub.example.com'],
+            'valid Hostname - With Hyphen' => ['my-site.org'],
+            'valid Hostname - Local' => ['myapp.local'],
+            'valid Hostname - Multiple Hyphens' => ['host-with-dash.com'],
 
-            // Valid localhost
-            ['localhost'],
+            'valid Localhost' => ['localhost'],
 
-            // Valid domain with port (if necessary)
-            ['example.com:8080'],
-            ['subdomain.myapp.com:3000'],
+            'valid Domain with Port - Standard' => ['example.com:8080'],
+            'valid Domain with Port - Subdomain' => ['subdomain.myapp.com:3000'],
         ];
     }
 
@@ -49,44 +44,38 @@ class IpOrHostTest extends TestCase
     public static function invalidIpOrHostProvider(): array
     {
         return [
-            // Invalid IPv4 addresses
-            ['999.999.999.999'], // Out of range
-            ['256.256.256.256'], // Out of range
-            ['192.168.1'],       // Incomplete IPv4
-            ['10.0.0.999'],      // Invalid last octet
-            ['1234.123.123.123'], // Too many digits in first octet
+            'invalid ipv4 - Out of Range' => ['999.999.999.999'],
+            'invalid ipv4 - All Octets Out of Range' => ['256.256.256.256'],
+            'invalid ipv4 - Incomplete' => ['192.168.1'],
+            'invalid ipv4 - Last Octet Out of Range' => ['10.0.0.999'],
+            'invalid ipv4 - First Octet Too Long' => ['1234.123.123.123'],
 
-            // Invalid IPv6 addresses
-            ['::12345'],         // Invalid compression or too many digits
-            ['2001:0db8:85a3:0000:0000:8a2e:0370:7334::'], // Too many ::
-            ['2001:db8::85a3::8a2e:370:7334'], // Double ::
-            ['1200::AB00:1234::2552:7777:1313'], // Invalid segments
+            'invalid ipv6 - invalid Compression' => ['::12345'],
+            'invalid ipv6 - Too Many Compressions' => ['2001:0db8:85a3:0000:0000:8a2e:0370:7334::'],
+            'invalid ipv6 - Double Compression' => ['2001:db8::85a3::8a2e:370:7334'],
+            'invalid ipv6 - invalid Segments' => ['1200::AB00:1234::2552:7777:1313'],
 
-            // Invalid hostnames
-            ['example..com'],        // Double dots
-            ['-example.com'],        // Starts with a dash
-            ['example-.com'],        // Ends with a dash
-            ['.example.com'],        // Starts with a dot
-            ['example.com-'],        // Ends with a dash
-            ['exa_mple.com'],        // Underscore in hostname (invalid)
-            ['ex*ample.com'],        // Special character
-            ['example'],             // No TLD
-            ['com'],                 // Only TLD
-            ['example.c'],           // TLD too short
+            'invalid Hostname - Double Dots' => ['example..com'],
+            'invalid Hostname - Starts with Dash' => ['-example.com'],
+            'invalid Hostname - Name Ends with Dash' => ['example-.com'],
+            'invalid Hostname - Starts with Dot' => ['.example.com'],
+            'invalid Hostname - Domain Ends with Dash' => ['example.com-'],
+            'invalid Hostname - Contains Underscore' => ['exa_mple.com'],
+            'invalid Hostname - Contains Special Character' => ['ex*ample.com'],
+            'invalid Hostname - No TLD' => ['example'],
+            'invalid Hostname - Only TLD' => ['com'],
+            'invalid Hostname - TLD Too Short' => ['example.c'],
 
-            // Invalid Punycode/Unicode domains
-            ['xn--'], // Incomplete punycode
-            ['xn--abc--def.com'], // Malformed punycode
+            'invalid Punycode - Incomplete' => ['xn--'],
+            'invalid Punycode - Malformed' => ['xn--abc--def.com'],
 
-            // Invalid localhost with port
-            ['localhost:999999'], // Invalid port number
-            ['localhost:abc'], // Non-numeric port
+            'invalid Localhost - Port Out of Range' => ['localhost:999999'],
+            'invalid Localhost - Non-numeric Port' => ['localhost:abc'],
 
-            // Invalid domain with port
-            ['example.com:70000'],  // Port out of range (valid range 1-65535)
-            ['example.com:abcd'],   // Non-numeric port
-            ['example.com:'],       // Missing port number after colon
-            ['subdomain.example.com:-1'],  // Negative port number
+            'invalid Domain with Port - Out of Range' => ['example.com:70000'],
+            'invalid Domain with Port - Non-numeric' => ['example.com:abcd'],
+            'invalid Domain with Port - Missing Number' => ['example.com:'],
+            'invalid Domain with Port - Negative Number' => ['subdomain.example.com:-1'],
         ];
     }
 
