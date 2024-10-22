@@ -100,8 +100,17 @@ watch(confirmingMonitorDeletion, (value) => {
     }
 });
 
+watch(
+    () => [monitorForm.method, monitorForm.interval],
+    () => {
+        monitorForm.put(route('monitor.update', props.monitor.data.id));
+    },
+    { immediate: false },
+);
+
 watchDeep(triggerForm, async () => {
     if (!triggerForm.type) {
+        options.value = [];
         return;
     }
 
@@ -175,14 +184,6 @@ const deleteTrigger = (id: string | number) => {
         },
     );
 };
-
-watch(
-    () => [monitorForm.method, monitorForm.interval],
-    () => {
-        monitorForm.put(route('monitor.update', props.monitor.data.id));
-    },
-    { immediate: false },
-);
 </script>
 
 <template>

@@ -37,6 +37,7 @@ class PerformCheckNotification
                 $monitorPassableDTO->monitor->user,
                 new TriggerAlert(
                     monitorName: $monitorPassableDTO->monitor->name,
+                    monitorId: $monitorPassableDTO->monitor->id,
                     reasons: $monitorPassableDTO->getReasons(),
                 )
             );

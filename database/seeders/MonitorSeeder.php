@@ -15,23 +15,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class MonitorSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
-    public function run(): void
-    {
-        Monitor::factory(10)
-            ->for(User::factory())
-            ->has(
-                Trigger::factory()
-                    ->state([
-                        'type' => TriggerType::HTTP_STATUS_CODE,
-                        'value' => 500,
-                        'operator' => Operator::GREATER_THAN,
-                    ])
-            )->create();
-    }
-
     public static function runFor(User $user, int $count = 1): void
     {
         // Time series for the checks
@@ -63,5 +46,22 @@ class MonitorSeeder extends Seeder
                     ))
             )
             ->create();
+    }
+
+    /**
+     * Run the database seeds.
+     */
+    public function run(): void
+    {
+        Monitor::factory(10)
+            ->for(User::factory())
+            ->has(
+                Trigger::factory()
+                    ->state([
+                        'type' => TriggerType::HTTP_STATUS_CODE,
+                        'value' => 500,
+                        'operator' => Operator::GREATER_THAN,
+                    ])
+            )->create();
     }
 }

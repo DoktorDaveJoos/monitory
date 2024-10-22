@@ -14,6 +14,8 @@
         "laravel/horizon": "^5.25",
         "laravel/prompts": "^0.1.21",
         "laravel/sanctum": "^4.0",
+        "laravel/slack-notification-channel": "^3.3",
+        "laravel/socialite": "^5.16",
         "laravel/telescope": "^5.0",
         "laravel/tinker": "^2.9",
         "lemonsqueezy/laravel": "^1.5",
@@ -24,6 +26,7 @@
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^3.0",
         "fakerphp/faker": "^1.23",
+        "laravel/pail": "^1.1",
         "laravel/breeze": "^2.0",
         "laravel/pint": "^1.15",
         "laravel/sail": "^1.26",
@@ -59,6 +62,10 @@
             "@php artisan key:generate --ansi",
             "@php -r \"file_exists('database/database.sqlite') || touch('database/database.sqlite');\"",
             "@php artisan migrate --graceful --ansi"
+        ],
+        "dev": [
+            "Composer\\Config::disableProcessTimeout",
+            "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#fdba74\" \"php artisan serve\" \"php artisan queue:listen --tries=1\" \"php artisan pail\" \"npm run dev\" --names=server,queue,logs,vite"
         ]
     },
     "extra": {

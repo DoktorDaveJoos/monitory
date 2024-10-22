@@ -4,8 +4,29 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MonitorController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TriggerController;
+use App\Models\SlackConnection;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Route;
+use Laravel\Socialite\Facades\Socialite;
+
+Route::get('/auth/slack/redirect', function () {
+    return Socialite::driver('slack')
+        ->asBotUser()
+        ->setScopes(['chat:write', 'chat:write.public', 'chat:write.customize'])
+        ->redirect();
+})->name('oauth.slack.redirect');
+
+Route::get('/auth/slack/callback', function () {
+    $bot = Socialite::driver('slack')->asBotUser()->user();
+
+    SlackConnection::updateOrCreate(
+        ['user_id' => auth()->id()],
+        ['token' => $bot->token]
+    );
+
+    return redirect()->route('profile.edit');
+
+})->name('oauth.slack.callback');
 
 Route::get('/', function () {
     return redirect('/login');
@@ -23,6 +44,10 @@ if (! app()->environment('production')) {
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::patch('/profile/notification-settings', [ProfileController::class, 'updateNotificationSettings'])->name('profile.notification-settings');
+    Route::patch('/profile/slack-channel', [ProfileController::class, 'updateSlackChannel'])->name('profile.slack-channel');
+    Route::delete('/profile/slack-connection', [ProfileController::class, 'destroySlackConnection'])->name('profile.slack-connection.destroy');
+    Route::post('/profile/slack-connection/test', [ProfileController::class, 'testSlackConnection'])->name('profile.slack-connection.test');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 

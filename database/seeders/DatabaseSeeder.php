@@ -13,18 +13,12 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
         $user = User::factory()->create([
             'name' => 'Test User',
             'email' => 'test@test.de',
             'password' => bcrypt('test'),
         ]);
 
-        MonitorSeeder::runFor($user);
-
-        $this->call([
-            MonitorSeeder::class,
-        ]);
+        //        MonitorSeeder::runFor($user);
     }
 }

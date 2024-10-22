@@ -3,11 +3,15 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Attribute;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Notifications\Notification;
+use Illuminate\Notifications\Slack\SlackRoute;
 use Illuminate\Support\Collection;
 use LemonSqueezy\Laravel\Billable;
 
@@ -17,7 +21,9 @@ use LemonSqueezy\Laravel\Billable;
  * @property string $email
  * @property string $password
  * @property string|null $email_verified_at
+ * @property array $settings
  * @property Collection<Monitor> $monitors
+ * @property SlackConnection $slackConnection
  */
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -40,6 +46,11 @@ class User extends Authenticatable implements MustVerifyEmail
         'name',
         'email',
         'password',
+        'settings',
+    ];
+
+    protected $casts = [
+        'settings' => 'array',
     ];
 
     /**
@@ -53,6 +64,24 @@ class User extends Authenticatable implements MustVerifyEmail
     ];
 
     /**
+     * Route notifications for the Slack channel.
+     */
+    public function routeNotificationForSlack(Notification $notification): mixed
+    {
+        return SlackRoute::make('alle-in-slack', $this->slackConnection->token);
+    }
+
+    public function monitors(): HasMany
+    {
+        return $this->hasMany(Monitor::class);
+    }
+
+    public function slackConnection(): HasOne
+    {
+        return $this->hasOne(SlackConnection::class);
+    }
+
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>
@@ -63,10 +92,5 @@ class User extends Authenticatable implements MustVerifyEmail
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
-    }
-
-    public function monitors(): HasMany
-    {
-        return $this->hasMany(Monitor::class);
     }
 }

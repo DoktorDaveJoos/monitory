@@ -15,6 +15,15 @@ export interface User {
     name: string;
     email: string;
     email_verified_at: string;
+    created_at: string;
+    updated_at: string;
+    settings: {
+        notifications: {
+            email: boolean;
+            slack: boolean;
+        };
+    };
+    slack_connected: boolean;
 }
 
 export interface MonitorListItem {
