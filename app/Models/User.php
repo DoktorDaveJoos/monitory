@@ -68,7 +68,7 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function routeNotificationForSlack(Notification $notification): mixed
     {
-        return SlackRoute::make('alle-in-slack', $this->slackConnection->token);
+        return SlackRoute::make($this->slackConnection->channel, $this->slackConnection->token);
     }
 
     public function monitors(): HasMany

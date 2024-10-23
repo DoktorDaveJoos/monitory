@@ -4,8 +4,8 @@ namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Messages\SlackMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Notifications\Slack\SlackMessage;
 
 class TestSlackConnectionNotification extends Notification
 {
@@ -34,24 +34,24 @@ class TestSlackConnectionNotification extends Notification
      */
     public function toMail(object $notifiable): MailMessage
     {
-        return (new MailMessage);
+        return new MailMessage;
     }
 
     public function toSlack(object $notifiable): SlackMessage
     {
         return (new SlackMessage)
-            ->content('This is a test notification of a Slack connection.');
-
-        /**
-         * Get the array representation of the notification.
-         *
-         * @return array<string, mixed>
-         */
-        public
-        function toArray(object $notifiable): array
-        {
-            return [
-                //
-            ];
-        }
+            ->text('This is a test notification.');
     }
+
+    /**
+     * Get the array representation of the notification.
+     *
+     * @return array<string, mixed>
+     */
+    public function toArray(object $notifiable): array
+    {
+        return [
+            //
+        ];
+    }
+}

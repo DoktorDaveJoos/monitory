@@ -23,7 +23,9 @@ export interface User {
             slack: boolean;
         };
     };
-    slack_connected: boolean;
+    slack_connection: {
+        channel: string;
+    };
 }
 
 export interface MonitorListItem {

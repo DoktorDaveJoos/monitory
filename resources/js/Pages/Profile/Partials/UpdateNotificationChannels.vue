@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { router, useForm, usePage } from '@inertiajs/vue3';
+import { useForm } from '@inertiajs/vue3';
 import { Label } from '@/Components/ui/label';
 import { Button } from '@/Components/ui/button';
 import { Checkbox } from '@/Components/ui/checkbox';
@@ -19,7 +19,9 @@ import { ref } from 'vue';
 import { User } from '@/types';
 
 const props = defineProps<{
-    user: User;
+    user: {
+        data: User;
+    };
 }>();
 
 const form = useForm<{
@@ -65,6 +67,10 @@ const destroySlackConnection = () => {
             deleteSlackConnectionModal.value = false;
         },
     });
+};
+
+const sendSlackTestNotification = () => {
+    useForm({}).post(route('profile.slack-connection.test'));
 };
 </script>
 
@@ -298,7 +304,21 @@ const destroySlackConnection = () => {
                                     </DialogFooter>
                                 </DialogContent>
                             </Dialog>
-                            at any time. Or
+                            at any time.
+
+                            <template
+                                v-if="user.data.slack_connection?.channel"
+                            >
+                                Or
+                                <button
+                                    @click.prevent="sendSlackTestNotification"
+                                    class="text-primary hover:text-primary/80"
+                                >
+                                    Send a test notification.
+                                </button>
+                            </template>
+
+                            Or
                             <Dialog
                                 v-model:open="deleteSlackConnectionModal"
                                 :default-open="false"
