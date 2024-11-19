@@ -25,43 +25,52 @@ class PerformCheckNotification
             'monitor_type' => $monitorPassableDTO->monitor->type->value,
         ]);
 
+        $healthy = $monitorPassableDTO->monitor->success;
+        $failedCheck = $monitorPassableDTO->failed();
+
         // Only send alert if monitor is not already in failed state
-        if ($monitorPassableDTO->failed() && $monitorPassableDTO->monitor->success) {
-
-            Log::debug('Sending alert', [
-                'monitor_id' => $monitorPassableDTO->monitor->id,
-                'reasons' => $monitorPassableDTO->getReasons(),
-            ]);
-
-            Notification::send(
-                $monitorPassableDTO->monitor->user,
-                new TriggerAlert(
-                    monitorName: $monitorPassableDTO->monitor->name,
-                    monitorId: $monitorPassableDTO->monitor->id,
-                    reasons: $monitorPassableDTO->getReasons(),
-                )
-            );
-
-            $monitorPassableDTO->monitor->increment('alert_count');
-
+        if ($healthy && $failedCheck) {
+            $this->sendAlert($monitorPassableDTO);
             return $next($monitorPassableDTO);
         }
 
         // Monitor is back online
-        if (! $monitorPassableDTO->monitor->success && ! $monitorPassableDTO->failed()) {
-
-            Log::debug('Sending recovery notification', [
-                'monitor_id' => $monitorPassableDTO->monitor->id,
-            ]);
-
-            Notification::send(
-                $monitorPassableDTO->monitor->user,
-                new MonitorRecovered(
-                    monitorId: $monitorPassableDTO->monitor->id
-                )
-            );
+        if (! $healthy && ! $failedCheck) {
+            $this->sendRecovery($monitorPassableDTO);
         }
 
         return $next($monitorPassableDTO);
+    }
+
+    private function sendAlert(MonitorPassableDTO $monitorPassableDTO): void
+    {
+        Log::debug('Sending alert notification', [
+            'monitor_id' => $monitorPassableDTO->monitor->id,
+        ]);
+
+        Notification::send(
+            $monitorPassableDTO->monitor->user,
+            new TriggerAlert(
+                monitorName: $monitorPassableDTO->monitor->name,
+                monitorId: $monitorPassableDTO->monitor->id,
+                reasons: $monitorPassableDTO->getReasons(),
+            )
+        );
+
+        $monitorPassableDTO->monitor->increment('alert_count');
+    }
+
+    private function sendRecovery(MonitorPassableDTO $monitorPassableDTO): void
+    {
+        Log::debug('Sending recovery notification', [
+            'monitor_id' => $monitorPassableDTO->monitor->id,
+        ]);
+
+        Notification::send(
+            $monitorPassableDTO->monitor->user,
+            new MonitorRecovered(
+                monitorId: $monitorPassableDTO->monitor->id
+            )
+        );
     }
 }
