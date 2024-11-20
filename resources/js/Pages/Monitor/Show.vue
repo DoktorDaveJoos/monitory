@@ -350,25 +350,25 @@ const deleteTrigger = (id: string | number) => {
                 <div class="flex justify-center mt-2">
                     <div
                         :class="
-                            monitor.type === 'http'
+                            monitor.data.type === 'http'
                                 ? 'grid grid-cols-2 md:grid-cols-5 gap-2'
                                 : 'grid grid-cols-2 gap-2'
                         "
                     >
                         <MonitorStats
-                            v-if="monitor.type === 'http'"
+                            v-if="monitor.data.type === 'http'"
                             label="2xx"
                             :value="monitor_stats['2xx'].absolute"
                             :trend="monitor_stats['2xx'].percentage"
                         />
                         <MonitorStats
-                            v-if="monitor.type === 'http'"
+                            v-if="monitor.data.type === 'http'"
                             label="4xx"
                             :value="monitor_stats['4xx'].absolute"
                             :trend="monitor_stats['4xx'].percentage"
                         />
                         <MonitorStats
-                            v-if="monitor.type === 'http'"
+                            v-if="monitor.data.type === 'http'"
                             label="5xx"
                             :value="monitor_stats['5xx'].absolute"
                             :trend="monitor_stats['5xx'].percentage"

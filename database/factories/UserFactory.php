@@ -31,7 +31,7 @@ class UserFactory extends Factory
             'remember_token' => Str::random(10),
             'settings' => [
                 'notifications' => [
-                    'email' => true,
+                    'mail' => true,
                     'slack' => false,
                     'sms' => false,
                 ],

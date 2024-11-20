@@ -27,7 +27,7 @@ const props = defineProps<{
 const form = useForm<{
     settings: {
         notifications: {
-            email: boolean;
+            mail: boolean;
             slack: boolean;
             sms: boolean;
         };
@@ -37,7 +37,7 @@ const form = useForm<{
         ? { ...props.user.data.settings }
         : {
               notifications: {
-                  email: true,
+                  mail: true,
                   slack: false,
                   sms: false,
               },
@@ -92,10 +92,10 @@ const sendSlackTestNotification = () => {
                 <div class="items-top flex gap-x-2">
                     <Checkbox
                         id="notification.email"
-                        :checked="form.settings?.notifications?.email ?? true"
+                        :checked="form.settings?.notifications?.mail ?? true"
                         @update:checked="
                             (value) =>
-                                (form.settings.notifications.email = value)
+                                (form.settings.notifications.mail = value)
                         "
                     />
                     <div class="grid gap-1.5 leading-none">

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Http\Requests\StoreNotificationSettingsRequest;
 use App\Http\Resources\UserResource;
 use App\Notifications\TestSlackConnectionNotification;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -27,17 +28,10 @@ class ProfileController extends Controller
         ]);
     }
 
-    public function updateNotificationSettings(Request $request): RedirectResponse
+    public function updateNotificationSettings(StoreNotificationSettingsRequest $request): RedirectResponse
     {
-
-        $request->validate([
-            'settings' => 'array',
-            'settings.notifications.email' => 'boolean',
-            'settings.notifications.slack' => 'boolean',
-        ]);
-
         $request->user()->update([
-            'settings' => $request->input('settings'),
+            'settings' => $request->validated('settings'),
         ]);
 
         return Redirect::route('profile.edit');

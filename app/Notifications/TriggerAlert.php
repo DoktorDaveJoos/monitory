@@ -9,6 +9,7 @@ use Illuminate\Notifications\Slack\BlockKit\Blocks\ActionsBlock;
 use Illuminate\Notifications\Slack\BlockKit\Blocks\ContextBlock;
 use Illuminate\Notifications\Slack\BlockKit\Blocks\SectionBlock;
 use Illuminate\Notifications\Slack\SlackMessage;
+use Illuminate\Support\Facades\Log;
 
 class TriggerAlert extends Notification
 {
@@ -30,11 +31,11 @@ class TriggerAlert extends Notification
      */
     public function via(object $notifiable): array
     {
-        if ($notifiable->settings['notifications']['email'] ?? false) {
-            return ['mail'];
-        }
+        // Get all notification channels from the user's settings
+        $channels = array_keys(array_filter($notifiable->settings['notifications'] ?? []));
 
-        return array_keys(array_filter($notifiable->settings['notifications'] ?? []));
+        // Return unique channels to avoid duplication
+        return array_unique($channels);
     }
 
     /**
