@@ -23,6 +23,7 @@ class EnumOptionResource extends JsonResource
         return [
             'value' => $this->value,
             'label' => $this->getLabel(),
+            'unit' => method_exists($this->resource, 'getUnit') ? $this->getUnit() : '',
         ];
     }
 }

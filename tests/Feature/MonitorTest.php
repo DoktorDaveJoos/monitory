@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Enums\ActionType;
+use App\Enums\AuthType;
 use App\Enums\HttpMethod;
 use App\Enums\Interval;
 use App\Enums\Operator;
@@ -41,6 +42,8 @@ class MonitorTest extends TestCase
         ]);
 
         $response = $this->get("/monitor/$monitor->id");
+
+//        dd($response);
 
         $response
             ->assertInertia(fn (AssertableInertia $page) => $page
@@ -436,5 +439,200 @@ class MonitorTest extends TestCase
         $response = $this->get("/monitor/$monitor->id");
 
         $response->assertNotFound();
+    }
+
+    public function test_monitor_can_created_with_basic_auth(): void
+    {
+        $this->actingAs($this->user);
+
+        $response = $this->post('/monitor', [
+            'name' => 'My Monitor',
+            'type' => ActionType::HTTP->value,
+            'url' => self::URL,
+            'method' => HttpMethod::GET->value,
+            'interval' => Interval::MINUTES_5->value,
+            'auth' => AuthType::BASIC->value,
+            'auth_username' => 'username',
+            'auth_password' => 'password',
+        ]);
+
+        // Inertia redirects to the monitors index page
+        $response->assertStatus(302);
+
+        $this->assertDatabaseHas('monitors', [
+            'name' => 'My Monitor',
+            'type' => ActionType::HTTP,
+            'url' => self::URL,
+            'method' => HttpMethod::GET,
+            'interval' => Interval::MINUTES_5,
+            'auth' => 'basic_auth',
+            'auth_username' => 'username',
+            'auth_password' => 'password',
+        ]);
+    }
+
+    public function test_monitor_can_created_with_bearer_token_auth(): void
+    {
+        $this->actingAs($this->user);
+
+        $response = $this->post('/monitor', [
+            'name' => 'My Monitor',
+            'type' => ActionType::HTTP->value,
+            'url' => self::URL,
+            'method' => HttpMethod::GET->value,
+            'interval' => Interval::MINUTES_5->value,
+            'auth' => AuthType::BEARER->value,
+            'auth_token' => 'token',
+        ]);
+
+        // Inertia redirects to the monitors index page
+        $response->assertStatus(302);
+
+        $this->assertDatabaseHas('monitors', [
+            'name' => 'My Monitor',
+            'type' => ActionType::HTTP,
+            'url' => self::URL,
+            'method' => HttpMethod::GET,
+            'interval' => Interval::MINUTES_5,
+            'auth' => 'bearer_token',
+            'auth_token' => 'token',
+        ]);
+    }
+
+    public function test_monitor_can_created_with_digest_auth(): void
+    {
+        $this->actingAs($this->user);
+
+        $response = $this->post('/monitor', [
+            'name' => 'My Monitor',
+            'type' => ActionType::HTTP->value,
+            'url' => self::URL,
+            'method' => HttpMethod::GET->value,
+            'interval' => Interval::MINUTES_5->value,
+            'auth' => AuthType::DIGEST->value,
+            'auth_token' => 'token',
+        ]);
+
+        // Inertia redirects to the monitors index page
+        $response->assertStatus(302);
+
+        $this->assertDatabaseHas('monitors', [
+            'name' => 'My Monitor',
+            'type' => ActionType::HTTP,
+            'url' => self::URL,
+            'method' => HttpMethod::GET,
+            'interval' => Interval::MINUTES_5,
+            'auth' => 'digest_auth',
+            'auth_token' => 'token',
+        ]);
+    }
+
+    public function test_monitor_with_same_url_can_be_created_by_different_users(): void
+    {
+        $this->actingAs($this->user);
+
+        $response = $this->post('/monitor', [
+            'name' => 'My Monitor',
+            'type' => ActionType::HTTP->value,
+            'url' => self::URL,
+            'method' => HttpMethod::GET->value,
+            'interval' => Interval::MINUTES_5->value,
+        ]);
+
+        // Inertia redirects to the monitors index page
+        $response->assertStatus(302);
+
+        $this->assertDatabaseHas('monitors', [
+            'name' => 'My Monitor',
+            'type' => ActionType::HTTP,
+            'url' => self::URL,
+            'method' => HttpMethod::GET,
+            'interval' => Interval::MINUTES_5,
+        ]);
+
+        $this->actingAs(User::factory()->create());
+
+        $response = $this->post('/monitor', [
+            'name' => 'My Monitor',
+            'type' => ActionType::HTTP->value,
+            'url' => self::URL,
+            'method' => HttpMethod::GET->value,
+            'interval' => Interval::MINUTES_5->value,
+        ]);
+
+        // Inertia redirects to the monitors index page
+        $response->assertStatus(302);
+
+        $this->assertDatabaseHas('monitors', [
+            'name' => 'My Monitor',
+            'type' => ActionType::HTTP,
+            'url' => self::URL,
+            'method' => HttpMethod::GET,
+            'interval' => Interval::MINUTES_5,
+        ]);
+    }
+
+    public function test_monitor_with_type_ping_can_be_stored(): void
+    {
+        $this->actingAs($this->user);
+
+        $this->post('/monitor', [
+            'name' => 'My Monitor',
+            'type' => ActionType::PING->value,
+            'host' => '192.168.1.1',
+            'interval' => Interval::MINUTES_5->value,
+        ])->assertRedirect();
+    }
+
+    public function test_monitor_with_type_ping_cannot_be_stored_without_host(): void
+    {
+        $this->actingAs($this->user);
+
+        $response = $this->post('/monitor', [
+            'name' => 'My Monitor',
+            'type' => ActionType::PING->value,
+            'interval' => Interval::MINUTES_5->value,
+        ]);
+
+        $response->assertSessionHasErrors('host');
+
+        $this->assertDatabaseMissing('monitors', [
+            'name' => 'My Monitor',
+        ]);
+    }
+
+    public function test_monitor_with_type_ping_cannot_be_stored_with_url(): void
+    {
+        $this->actingAs($this->user);
+
+        $response = $this->post('/monitor', [
+            'name' => 'My Monitor',
+            'type' => ActionType::PING->value,
+            'url' => self::URL,
+            'interval' => Interval::MINUTES_5->value,
+        ]);
+
+        $response->assertSessionHasErrors('host');
+
+        $this->assertDatabaseMissing('monitors', [
+            'name' => 'My Monitor',
+        ]);
+    }
+
+    public function test_monitor_with_type_http_requires_url(): void
+    {
+        $this->actingAs($this->user);
+
+        $response = $this->post('/monitor', [
+            'name' => 'My Monitor',
+            'type' => ActionType::HTTP->value,
+            'interval' => Interval::MINUTES_5->value,
+        ]);
+
+        $response->assertSessionHasErrors('url');
+
+        $this->assertDatabaseMissing('monitors', [
+            'name' => 'My Monitor',
+        ]);
     }
 }

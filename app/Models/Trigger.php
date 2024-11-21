@@ -30,6 +30,7 @@ class Trigger extends Model
     protected $casts = [
         'operator' => Operator::class,
         'type' => TriggerType::class,
+        'value' => 'integer',
     ];
 
     public function monitor(): BelongsTo

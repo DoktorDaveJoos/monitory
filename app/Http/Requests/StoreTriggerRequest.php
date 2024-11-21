@@ -6,7 +6,11 @@ use App\Enums\Operator;
 use App\Enums\TriggerType;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
+/**
+ * @property string $type
+ */
 class StoreTriggerRequest extends FormRequest
 {
     /**
@@ -26,8 +30,17 @@ class StoreTriggerRequest extends FormRequest
     {
         return [
             'type' => 'required|in:'.implode(',', TriggerType::values()),
-            'operator' => 'required|in:'.implode(',', Operator::values()),
-            'value' => 'required|numeric',
+            'operator' => [
+                Rule::when(self::notPing($this->type), 'required|in:'.implode(',', Operator::values())),
+            ],
+            'value' => [
+                Rule::when(self::notPing($this->type), 'required|numeric'),
+            ],
         ];
+    }
+
+    public static function notPing(string $type): bool
+    {
+        return $type !== TriggerType::PING->value;
     }
 }

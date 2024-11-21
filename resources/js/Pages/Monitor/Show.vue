@@ -5,6 +5,8 @@ import { Chart } from '@/Components/ui/chart';
 import {
     Monitor,
     MonitorStats as MonitorStatsType,
+    Operator,
+    OperatorsCollection,
     OptionEnum,
     ResourceCollection,
     ResourceItem,
@@ -14,14 +16,14 @@ import {
     CircleAlert,
     EllipsisVertical,
     ExternalLink,
+    Flame,
     Monitor as MonitorIcon,
     PlugZap,
     Plus,
     Trash2,
-    Flame,
 } from 'lucide-vue-next';
 import LayoutHeader from '@/Components/LayoutHeader.vue';
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { Card } from '@/Components/ui/card';
 import { Button } from '@/Components/ui/button';
 import { Label } from '@/Components/ui/label';
@@ -56,6 +58,8 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/Components/ui/dropdown-menu';
+import { watchDeep } from '@vueuse/core';
+import axios from 'axios';
 
 const props = defineProps<{
     monitor: ResourceItem<Monitor>;
@@ -63,7 +67,7 @@ const props = defineProps<{
     trigger: ResourceCollection<Trigger>;
     trigger_options: {
         trigger_types: ResourceCollection<OptionEnum>;
-        operators: ResourceCollection<OptionEnum>;
+        operators: OperatorsCollection;
         http_status_codes: ResourceCollection<OptionEnum>;
     };
     monitor_stats: MonitorStatsType;
@@ -72,6 +76,7 @@ const props = defineProps<{
 const confirmingMonitorDeletion = ref(false);
 const nameConfirmation = ref('');
 const createTriggerDialog = ref(false);
+const options = ref<Array<OptionEnum>>([]);
 
 const monitorForm = useForm<{
     method: string;
@@ -95,6 +100,48 @@ watch(confirmingMonitorDeletion, (value) => {
     if (!value) {
         nameConfirmation.value = '';
     }
+});
+
+watch(
+    () => [monitorForm.method, monitorForm.interval],
+    () => {
+        monitorForm.put(route('monitor.update', props.monitor.data.id));
+    },
+    { immediate: false },
+);
+
+watchDeep(triggerForm, async () => {
+    if (!triggerForm.type) {
+        options.value = [];
+        return;
+    }
+
+    const response = await axios.get(
+        route('trigger.options', {
+            monitor: props.monitor.data.id,
+            type: triggerForm.type,
+        }),
+    );
+
+    const { data } = response.data;
+
+    options.value = data;
+});
+
+const operators = computed(() => {
+    return (
+        props.trigger_options.operators.data.find(
+            (entry: Operator) => entry.trigger === triggerForm.type,
+        )?.value ?? []
+    );
+});
+
+const unit = computed(() => {
+    return (
+        props.trigger_options.trigger_types.data.find(
+            (entry) => entry.value === triggerForm.type,
+        )?.unit ?? ''
+    );
 });
 
 const deleteMonitor = () => {
@@ -139,14 +186,6 @@ const deleteTrigger = (id: string | number) => {
         },
     );
 };
-
-watch(
-    () => [monitorForm.method, monitorForm.interval],
-    () => {
-        monitorForm.put(route('monitor.update', props.monitor.data.id));
-    },
-    { immediate: false },
-);
 </script>
 
 <template>
@@ -177,9 +216,13 @@ watch(
         </template>
         <template #center>
             <Card class="px-4 py-2 h-10 flex space-x-2 overflow-hidden">
-                <span class="font-bold">{{ monitor.data.method }}</span>
+                <span class="font-bold">{{
+                    monitor.data.method ?? 'Ping'
+                }}</span>
                 <div class="border-r-2 border-accent my-1" />
-                <span class="truncate">{{ monitor.data.url }}</span>
+                <span class="truncate">{{
+                    monitor.data.url ?? monitor.data.host
+                }}</span>
             </Card>
         </template>
         <template #actions>
@@ -192,13 +235,13 @@ watch(
                         <DropdownMenuLabel>Options</DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem :disabled="true">
-                            Pause Monitor</DropdownMenuItem
-                        >
+                            Pause Monitor
+                        </DropdownMenuItem>
                         <DropdownMenuItem
                             @click="confirmingMonitorDeletion = true"
                         >
-                            Delete Monitor</DropdownMenuItem
-                        >
+                            Delete Monitor
+                        </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>
@@ -307,18 +350,27 @@ watch(
                 </div>
 
                 <div class="flex justify-center mt-2">
-                    <div class="grid grid-cols-2 md:grid-cols-5 gap-2">
+                    <div
+                        :class="
+                            monitor.data.type === 'http'
+                                ? 'grid grid-cols-2 md:grid-cols-5 gap-2'
+                                : 'grid grid-cols-2 gap-2'
+                        "
+                    >
                         <MonitorStats
+                            v-if="monitor.data.type === 'http'"
                             label="2xx"
                             :value="monitor_stats['2xx'].absolute"
                             :trend="monitor_stats['2xx'].percentage"
                         />
                         <MonitorStats
+                            v-if="monitor.data.type === 'http'"
                             label="4xx"
                             :value="monitor_stats['4xx'].absolute"
                             :trend="monitor_stats['4xx'].percentage"
                         />
                         <MonitorStats
+                            v-if="monitor.data.type === 'http'"
                             label="5xx"
                             :value="monitor_stats['5xx'].absolute"
                             :trend="monitor_stats['5xx'].percentage"
@@ -340,7 +392,10 @@ watch(
             <div class="grid xl:grid-cols-2 gap-4 mt-8">
                 <div class="space-y-2">
                     <Label>Settings</Label>
-                    <Card class="flex justify-between items-center px-4 h-14">
+                    <Card
+                        v-if="monitor.data.type === 'http'"
+                        class="flex justify-between items-center px-4 h-14"
+                    >
                         <Label>Method</Label>
                         <Select v-model="monitorForm.method">
                             <SelectTrigger>
@@ -465,10 +520,24 @@ watch(
                                     />
 
                                     <Label for="type"> Operator </Label>
-                                    <Select v-model="triggerForm.operator">
-                                        <SelectTrigger class="w-full">
+                                    <Select
+                                        v-model="triggerForm.operator"
+                                        :disabled="operators.length === 0"
+                                    >
+                                        <SelectTrigger
+                                            class="w-full"
+                                            :class="
+                                                operators.length === 0
+                                                    ? 'bg-gray-200 cursor-not-allowed'
+                                                    : ''
+                                            "
+                                        >
                                             <SelectValue
-                                                placeholder="Select a trigger operator"
+                                                :placeholder="
+                                                    operators.length === 0
+                                                        ? '-'
+                                                        : 'Select a trigger operator'
+                                                "
                                             />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -477,8 +546,7 @@ watch(
                                                     >Options
                                                 </SelectLabel>
                                                 <SelectItem
-                                                    v-for="type in trigger_options
-                                                        .operators.data"
+                                                    v-for="type in operators"
                                                     :value="
                                                         type.value.toString()
                                                     "
@@ -495,15 +563,12 @@ watch(
 
                                     <Label for="type"> Value </Label>
                                     <Select
-                                        v-if="
-                                            triggerForm.type ===
-                                            'http_status_code'
-                                        "
+                                        v-if="options.length > 0"
                                         v-model="triggerForm.value"
                                     >
                                         <SelectTrigger class="w-full">
                                             <SelectValue
-                                                placeholder="Select an HTTP status code"
+                                                placeholder="Select an Option"
                                             />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -512,22 +577,46 @@ watch(
                                                     >Options
                                                 </SelectLabel>
                                                 <SelectItem
-                                                    v-for="status_code in trigger_options
-                                                        .http_status_codes.data"
+                                                    v-for="option in options"
                                                     :value="
-                                                        status_code.value.toString()
+                                                        option.value.toString()
                                                     "
                                                 >
-                                                    {{ status_code.label }}
+                                                    {{ option.label }}
                                                 </SelectItem>
                                             </SelectGroup>
                                         </SelectContent>
                                     </Select>
-                                    <Input v-else v-model="triggerForm.value" />
-                                    <InputError
-                                        :message="triggerForm.errors.operator"
-                                        class="mt-2"
-                                    />
+                                    <div
+                                        v-else
+                                        class="relative w-full items-center"
+                                    >
+                                        <Input
+                                            :disabled="operators.length === 0"
+                                            :placeholder="
+                                                operators.length === 0
+                                                    ? '-'
+                                                    : 'Enter a value'
+                                            "
+                                            v-model="triggerForm.value"
+                                            :class="
+                                                operators.length === 0
+                                                    ? 'bg-gray-200 cursor-not-allowed'
+                                                    : ''
+                                            "
+                                        />
+                                        <InputError
+                                            :message="
+                                                triggerForm.errors.operator
+                                            "
+                                            class="mt-2"
+                                        />
+                                        <span
+                                            class="absolute end-3 inset-y-0 text-card uppercase tracking-wide font-bold text-xs flex items-center justify-center"
+                                        >
+                                            <span>{{ unit }}</span>
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
                             <DialogFooter>

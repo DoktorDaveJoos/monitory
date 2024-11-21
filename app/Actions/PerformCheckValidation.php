@@ -60,7 +60,7 @@ class PerformCheckValidation
         return match ($trigger->type) {
             TriggerType::HTTP_STATUS_CODE => self::compare($check->status_code, $trigger->operator, $trigger->value),
             TriggerType::LATENCY => self::compare($check->response_time, $trigger->operator, $trigger->value),
-            default => false,
+            TriggerType::PING => self::compare($check->value, $trigger->operator, $trigger->value),
         };
     }
 

@@ -13,6 +13,7 @@ use Illuminate\Support\Carbon;
  * @property int status_code
  * @property int response_time
  * @property array response_body
+ * @property string|null value
  * @property array response_headers
  * @property bool success
  * @property Carbon started_at
@@ -31,6 +32,7 @@ class Check extends Model
         'response_body',
         'response_headers',
         'success',
+        'value',
         'started_at',
         'finished_at',
         'created_at',

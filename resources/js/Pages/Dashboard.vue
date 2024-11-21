@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, useForm } from '@inertiajs/vue3';
-import { Home, PlugZap, Plus, MonitorOff, Loader2 } from 'lucide-vue-next';
+import { Home, Loader2, MonitorOff, PlugZap, Plus } from 'lucide-vue-next';
 import LayoutHeader from '@/Components/LayoutHeader.vue';
 import DashboardChart from '@/Components/DashboardChart.vue';
 import { Monitor, ResourceCollection, Stats as StatsType } from '@/types';
 import { Label } from '@/Components/ui/label';
 import Stats from '@/Components/Stats.vue';
 import { Button } from '@/Components/ui/button';
+import { Switch } from '@/Components/ui/switch';
 import {
     Dialog,
     DialogContent,
@@ -18,7 +19,7 @@ import {
     DialogTrigger,
 } from '@/Components/ui/dialog';
 import { Input } from '@/Components/ui/input';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import {
     Select,
     SelectContent,
@@ -28,6 +29,12 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/Components/ui/select';
+import {
+    Accordion,
+    AccordionContent,
+    AccordionItem,
+    AccordionTrigger,
+} from '@/Components/ui/accordion';
 import InputError from '@/Components/InputError.vue';
 import { isUrlReachable } from '@/utils';
 
@@ -38,16 +45,46 @@ defineProps<{
 }>();
 
 const addMonitor = ref(false);
-const form = useForm({
+const form = useForm<{
+    name: string;
+    interval: string;
+    method?: string;
+    type: string;
+    url?: string;
+    host?: string;
+    auth?: string;
+    auth_username?: string;
+    auth_password?: string;
+    auth_token?: string;
+}>({
     name: '',
     interval: '',
     method: '',
     type: '',
     url: '',
+    host: '',
+    auth: '',
+    auth_username: '',
+    auth_password: '',
+    auth_token: '',
 });
 const connection = ref<boolean | null>(null);
+const showAuth = ref<boolean>(false);
 
 const submit = () => {
+    if (form.type === 'ping') {
+        delete form.url;
+        delete form.method;
+        delete form.auth;
+        delete form.auth_username;
+        delete form.auth_password;
+        delete form.auth_token;
+    }
+
+    if (form.type === 'http') {
+        delete form.host;
+    }
+
     form.post(route('monitor.store'), {
         onSuccess: () => {
             addMonitor.value = false;
@@ -65,6 +102,26 @@ const testConnection = async () => {
         isChecking.value = false;
         connection.value = false;
     }
+};
+
+watch(
+    () => form.auth,
+    () => {
+        resetAuth();
+    },
+);
+
+const resetAuth = () => {
+    form.reset('auth_username', 'auth_password', 'auth_token');
+};
+
+const handleAuthSwitch = (value: boolean) => {
+    if (!value) {
+        resetAuth();
+        form.reset('auth');
+    }
+
+    showAuth.value = value;
 };
 </script>
 
@@ -92,6 +149,16 @@ const testConnection = async () => {
                         </DialogDescription>
                     </DialogHeader>
                     <div class="grid gap-4 grid-cols-2 mb-4">
+                        <div class="col-span-2">
+                            <Label for="monitor-name">Monitor Name</Label>
+                            <Input
+                                id="monitor-name"
+                                v-model="form.name"
+                                :error="form.errors.name"
+                            />
+                            <InputError :message="form.errors.name" />
+                        </div>
+
                         <div>
                             <Label for="monitor-type">Monitor Type</Label>
                             <Select v-model="form.type">
@@ -106,11 +173,15 @@ const testConnection = async () => {
                                         <SelectItem value="http">
                                             http / https
                                         </SelectItem>
+                                        <SelectItem value="ping">
+                                            ping
+                                        </SelectItem>
                                     </SelectGroup>
                                 </SelectContent>
                             </Select>
                             <InputError :message="form.errors.type" />
                         </div>
+
                         <div>
                             <Label for="interval">Interval</Label>
                             <Select v-model="form.interval">
@@ -134,6 +205,18 @@ const testConnection = async () => {
                             <InputError :message="form.errors.interval" />
                         </div>
 
+                        <template v-if="form.type === 'ping'">
+                            <div class="col-span-2">
+                                <Label for="monitor-url">HOST</Label>
+                                <Input
+                                    id="monitor-host"
+                                    v-model="form.host"
+                                    :error="form.errors.host"
+                                />
+                                <InputError :message="form.errors.host" />
+                            </div>
+                        </template>
+
                         <template v-if="form.type === 'http'">
                             <div class="col-span-2">
                                 <Label for="monitor-url">URL</Label>
@@ -143,15 +226,6 @@ const testConnection = async () => {
                                     :error="form.errors.url"
                                 />
                                 <InputError :message="form.errors.url" />
-                            </div>
-                            <div>
-                                <Label for="monitor-name">Monitor Name</Label>
-                                <Input
-                                    id="monitor-name"
-                                    v-model="form.name"
-                                    :error="form.errors.name"
-                                />
-                                <InputError :message="form.errors.name" />
                             </div>
                             <div>
                                 <Label for="monitor-method"
@@ -183,6 +257,143 @@ const testConnection = async () => {
                                 </Select>
                                 <InputError :message="form.errors.method" />
                             </div>
+                            <div></div>
+                            <div>
+                                <div class="flex items-center space-x-2 mt-4">
+                                    <Switch
+                                        id="show-auth"
+                                        :value="showAuth.toString()"
+                                        @update:checked="handleAuthSwitch"
+                                    />
+                                    <Label for="show-auth"
+                                        >use authentication</Label
+                                    >
+                                </div>
+                            </div>
+                            <Accordion
+                                v-show="showAuth"
+                                type="single"
+                                class="w-full col-span-2"
+                                collapsible
+                                v-model="form.auth"
+                            >
+                                <AccordionItem value="basic_auth">
+                                    <AccordionTrigger
+                                        >Basic Auth
+                                    </AccordionTrigger>
+                                    <AccordionContent
+                                        class="grid gap-4 grid-cols-2"
+                                    >
+                                        <div>
+                                            <Label
+                                                for="monitor-basic-auth-username"
+                                                >Username</Label
+                                            >
+                                            <Input
+                                                id="monitor-basic-auth-username"
+                                                v-model="form.auth_username"
+                                                :error="
+                                                    form.errors.auth_username
+                                                "
+                                            />
+                                            <InputError
+                                                :message="
+                                                    form.errors.auth_username
+                                                "
+                                            />
+                                        </div>
+                                        <div>
+                                            <Label
+                                                for="monitor-basic-auth-password"
+                                                >Password</Label
+                                            >
+                                            <Input
+                                                id="monitor-basic-auth-password"
+                                                type="password"
+                                                v-model="form.auth_password"
+                                                :error="
+                                                    form.errors.auth_password
+                                                "
+                                            />
+                                            <InputError
+                                                :message="
+                                                    form.errors.auth_password
+                                                "
+                                            />
+                                        </div>
+                                    </AccordionContent>
+                                </AccordionItem>
+                                <AccordionItem value="digest_auth">
+                                    <AccordionTrigger
+                                        >Digest Auth
+                                    </AccordionTrigger>
+                                    <AccordionContent
+                                        class="grid gap-4 grid-cols-2"
+                                    >
+                                        <div>
+                                            <Label
+                                                for="monitor-digest-auth-username"
+                                                >Username</Label
+                                            >
+                                            <Input
+                                                id="monitor-digest-auth-username"
+                                                v-model="form.auth_username"
+                                                :error="
+                                                    form.errors.auth_username
+                                                "
+                                            />
+                                            <InputError
+                                                :message="
+                                                    form.errors.auth_username
+                                                "
+                                            />
+                                        </div>
+                                        <div>
+                                            <Label
+                                                for="monitor-digest-auth-password"
+                                                >Password</Label
+                                            >
+                                            <Input
+                                                id="monitor-digest-auth-password"
+                                                type="password"
+                                                v-model="form.auth_password"
+                                                :error="
+                                                    form.errors.auth_password
+                                                "
+                                            />
+                                            <InputError
+                                                :message="
+                                                    form.errors.auth_password
+                                                "
+                                            />
+                                        </div>
+                                    </AccordionContent>
+                                </AccordionItem>
+                                <AccordionItem value="bearer_token">
+                                    <AccordionTrigger
+                                        >Bearer Token
+                                    </AccordionTrigger>
+                                    <AccordionContent
+                                        class="grid gap-4 grid-cols-1"
+                                    >
+                                        <div>
+                                            <Label for="monitor-auth-token"
+                                                >Token</Label
+                                            >
+                                            <Input
+                                                id="monitor-auth-token"
+                                                v-model="form.auth_token"
+                                                :error="form.errors.auth_token"
+                                            />
+                                            <InputError
+                                                :message="
+                                                    form.errors.auth_token
+                                                "
+                                            />
+                                        </div>
+                                    </AccordionContent>
+                                </AccordionItem>
+                            </Accordion>
                         </template>
                     </div>
                     <DialogFooter class="space-x-2">
@@ -203,6 +414,7 @@ const testConnection = async () => {
                             Unreachable
                         </div>
                         <Button
+                            v-if="form.type === 'http'"
                             variant="secondary"
                             :disabled="!form.url || isChecking"
                             @click="testConnection"

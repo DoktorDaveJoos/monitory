@@ -6,11 +6,32 @@ export interface ResourceItem<T> {
     data: T;
 }
 
+export interface Operator {
+    trigger: string;
+    value: Array<OptionEnum>;
+}
+
+export interface OperatorsCollection {
+    data: Array<Operator>;
+}
+
 export interface User {
     id: number;
     name: string;
     email: string;
     email_verified_at: string;
+    created_at: string;
+    updated_at: string;
+    settings: {
+        notifications: {
+            mail: boolean;
+            slack: boolean;
+            sms: boolean;
+        };
+    };
+    slack_connection: {
+        channel: string;
+    };
 }
 
 export interface MonitorListItem {
@@ -25,6 +46,7 @@ export interface Monitor {
     name: string;
     type: string;
     url: string;
+    host: string;
     interval: number;
     active: boolean;
     method: string;
@@ -79,6 +101,7 @@ export interface MonitorStats {
 export interface OptionEnum {
     value: string;
     label: string;
+    unit: string;
 }
 
 export type PageProps<

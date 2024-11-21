@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Http\Requests\StoreNotificationSettingsRequest;
+use App\Http\Resources\UserResource;
+use App\Notifications\TestSlackConnectionNotification;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -21,7 +24,17 @@ class ProfileController extends Controller
         return Inertia::render('Profile/Edit', [
             'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
             'status' => session('status'),
+            'user' => UserResource::make($request->user()),
         ]);
+    }
+
+    public function updateNotificationSettings(StoreNotificationSettingsRequest $request): RedirectResponse
+    {
+        $request->user()->update([
+            'settings' => $request->validated('settings'),
+        ]);
+
+        return Redirect::route('profile.edit');
     }
 
     /**
@@ -36,6 +49,26 @@ class ProfileController extends Controller
         }
 
         $request->user()->save();
+
+        return Redirect::route('profile.edit');
+    }
+
+    public function updateSlackChannel(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'channel' => ['required', 'string', 'max:255'],
+        ]);
+
+        $request->user()->slackConnection()->update([
+            'channel' => $request->input('channel'),
+        ]);
+
+        return Redirect::route('profile.edit');
+    }
+
+    public function testSlackConnection(Request $request): RedirectResponse
+    {
+        $request->user()->notify(new TestSlackConnectionNotification);
 
         return Redirect::route('profile.edit');
     }
@@ -59,5 +92,12 @@ class ProfileController extends Controller
         $request->session()->regenerateToken();
 
         return Redirect::to('/');
+    }
+
+    public function destroySlackConnection(Request $request): RedirectResponse
+    {
+        $request->user()->slackConnection()->delete();
+
+        return Redirect::route('profile.edit');
     }
 }

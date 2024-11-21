@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Actions\StoreMonitor;
 use App\Actions\UpdateMonitor;
+use App\Enums\ActionType;
 use App\Enums\HttpStatusCode;
 use App\Enums\Operator;
 use App\Enums\TriggerType;
@@ -11,6 +12,7 @@ use App\Http\Requests\StoreMonitorRequest;
 use App\Http\Requests\UpdateMonitorRequest;
 use App\Http\Resources\EnumOptionResource;
 use App\Http\Resources\MonitorResource;
+use App\Http\Resources\OperatorsResource;
 use App\Http\Resources\TriggerResource;
 use App\Models\Check;
 use App\Models\Monitor;
@@ -36,8 +38,13 @@ class MonitorController extends Controller
             name: $request->validated('name'),
             type: $request->validated('type'),
             url: $request->validated('url'),
+            host: $request->validated('host'),
             method: $request->validated('method'),
-            interval: $request->validated('interval')
+            interval: $request->validated('interval'),
+            auth: $request->validated('auth'),
+            auth_username: $request->validated('auth_username'),
+            auth_password: $request->validated('auth_password'),
+            auth_token: $request->validated('auth_token'),
         );
 
         return to_route('monitor.show', $monitor->id);
@@ -85,14 +92,15 @@ class MonitorController extends Controller
             ? $averageLatencyOverall / $averageLastHour
             : 0;
 
+        $triggers = TriggerType::casesForType($monitor->type);
+
         return inertia('Monitor/Show', [
             'monitor' => MonitorResource::make($monitor),
             'check_labels' => Check::labels($from, $to),
             'trigger' => TriggerResource::collection($monitor->triggers),
             'trigger_options' => [
-                'trigger_types' => EnumOptionResource::collection(TriggerType::cases()),
-                'operators' => EnumOptionResource::collection(Operator::cases()),
-                'http_status_codes' => EnumOptionResource::collection(HttpStatusCode::cases()),
+                'trigger_types' => EnumOptionResource::collection($triggers),
+                'operators' => OperatorsResource::collection($triggers),
             ],
             'monitor_stats' => [
                 '2xx' => [
