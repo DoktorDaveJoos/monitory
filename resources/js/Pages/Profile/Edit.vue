@@ -8,12 +8,12 @@ import { Card } from '@/Components/ui/card';
 import { Settings } from 'lucide-vue-next';
 import LayoutHeader from '@/Components/LayoutHeader.vue';
 import UpdateNotificationChannels from '@/Pages/Profile/Partials/UpdateNotificationChannels.vue';
-import { User } from '@/types';
+import { ResourceItem, User } from '@/types';
 
 defineProps<{
     mustVerifyEmail?: boolean;
     status?: string;
-    user: User;
+    user: ResourceItem<User>;
 }>();
 </script>
 

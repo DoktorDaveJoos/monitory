@@ -36,9 +36,12 @@ export const fillMissingChecks = (
     return filledChecks;
 };
 
-export async function isUrlReachable(url: string) {
+export async function isUrlReachable(url?: string) {
     try {
-        const response = await fetch(url, { method: 'HEAD', mode: 'no-cors' });
+        if (!url) {
+            return false;
+        }
+        await fetch(url, { method: 'HEAD', mode: 'no-cors' });
         // If we get a response, even if it's 4xx or 5xx, consider it reachable
         return true;
     } catch (error) {

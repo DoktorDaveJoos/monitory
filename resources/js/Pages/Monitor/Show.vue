@@ -5,6 +5,7 @@ import { Chart } from '@/Components/ui/chart';
 import {
     Monitor,
     MonitorStats as MonitorStatsType,
+    Operator,
     OperatorsCollection,
     OptionEnum,
     ResourceCollection,
@@ -58,6 +59,7 @@ import {
     DropdownMenuTrigger,
 } from '@/Components/ui/dropdown-menu';
 import { watchDeep } from '@vueuse/core';
+import axios from 'axios';
 
 const props = defineProps<{
     monitor: ResourceItem<Monitor>;
@@ -74,7 +76,7 @@ const props = defineProps<{
 const confirmingMonitorDeletion = ref(false);
 const nameConfirmation = ref('');
 const createTriggerDialog = ref(false);
-const options = ref([]);
+const options = ref<Array<OptionEnum>>([]);
 
 const monitorForm = useForm<{
     method: string;
@@ -129,7 +131,7 @@ watchDeep(triggerForm, async () => {
 const operators = computed(() => {
     return (
         props.trigger_options.operators.data.find(
-            (entry) => entry.trigger === triggerForm.type,
+            (entry: Operator) => entry.trigger === triggerForm.type,
         )?.value ?? []
     );
 });
@@ -391,7 +393,7 @@ const deleteTrigger = (id: string | number) => {
                 <div class="space-y-2">
                     <Label>Settings</Label>
                     <Card
-                        v-if="monitor.type === 'http'"
+                        v-if="monitor.data.type === 'http'"
                         class="flex justify-between items-center px-4 h-14"
                     >
                         <Label>Method</Label>

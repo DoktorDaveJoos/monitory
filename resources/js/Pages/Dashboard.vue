@@ -45,7 +45,18 @@ defineProps<{
 }>();
 
 const addMonitor = ref(false);
-const form = useForm({
+const form = useForm<{
+    name: string;
+    interval: string;
+    method?: string;
+    type: string;
+    url?: string;
+    host?: string;
+    auth?: string;
+    auth_username?: string;
+    auth_password?: string;
+    auth_token?: string;
+}>({
     name: '',
     interval: '',
     method: '',

@@ -16,12 +16,10 @@ import {
 import { Input } from '@/Components/ui/input';
 import InputError from '@/Components/InputError.vue';
 import { ref } from 'vue';
-import { User } from '@/types';
+import { ResourceItem, User } from '@/types';
 
 const props = defineProps<{
-    user: {
-        data: User;
-    };
+    user: ResourceItem<User>;
 }>();
 
 const form = useForm<{
@@ -33,15 +31,7 @@ const form = useForm<{
         };
     };
 }>({
-    settings: props.user.data.settings?.notifications
-        ? { ...props.user.data.settings }
-        : {
-              notifications: {
-                  mail: true,
-                  slack: false,
-                  sms: false,
-              },
-          },
+    settings: { ...props.user.data.settings },
 });
 
 const channelForm = useForm({
@@ -158,10 +148,7 @@ const sendSlackTestNotification = () => {
                             </span>
                         </label>
                         <p
-                            v-if="
-                                !user.data.slack_connection &&
-                                !user.data.slack_connection?.channel
-                            "
+                            v-if="!user.data.slack_connection?.channel"
                             class="text-sm text-muted-foreground"
                         >
                             To enable Slack notifications, you must

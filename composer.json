@@ -9,6 +9,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "guzzlehttp/guzzle": "^7.9",
         "inertiajs/inertia-laravel": "^1.0",
         "laravel/framework": "^11.0",
         "laravel/horizon": "^5.25",
@@ -18,6 +19,7 @@
         "laravel/socialite": "^5.16",
         "laravel/telescope": "^5.0",
         "laravel/tinker": "^2.9",
+        "laravel/vonage-notification-channel": "^3.3",
         "lemonsqueezy/laravel": "^1.5",
         "lorisleiva/laravel-actions": "^2.8",
         "resend/resend-php": "^0.12.0",

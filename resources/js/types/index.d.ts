@@ -6,8 +6,13 @@ export interface ResourceItem<T> {
     data: T;
 }
 
+export interface Operator {
+    trigger: string;
+    value: Array<OptionEnum>;
+}
+
 export interface OperatorsCollection {
-    data: Array<Record<string, ResourceItem<OptionEnum>>>;
+    data: Array<Operator>;
 }
 
 export interface User {
@@ -19,8 +24,9 @@ export interface User {
     updated_at: string;
     settings: {
         notifications: {
-            email: boolean;
+            mail: boolean;
             slack: boolean;
+            sms: boolean;
         };
     };
     slack_connection: {
@@ -40,6 +46,7 @@ export interface Monitor {
     name: string;
     type: string;
     url: string;
+    host: string;
     interval: number;
     active: boolean;
     method: string;
