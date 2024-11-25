@@ -7,6 +7,7 @@ import { Link, useForm, usePage } from '@inertiajs/vue3';
 import { Label } from '@/Components/ui/label';
 import { Input } from '@/Components/ui/input';
 import { Button } from '@/Components/ui/button';
+import { ResourceItem, User } from '@/types';
 
 defineProps<{
     mustVerifyEmail?: Boolean;
@@ -16,8 +17,8 @@ defineProps<{
 const user = usePage().props.auth.user;
 
 const form = useForm({
-    name: user.name,
-    email: user.email,
+    name: user.data.name,
+    email: user.data.email,
 });
 </script>
 
@@ -66,7 +67,7 @@ const form = useForm({
                 <InputError class="mt-2" :message="form.errors.email" />
             </div>
 
-            <div v-if="mustVerifyEmail && user.email_verified_at === null">
+            <div v-if="mustVerifyEmail && user.data.email_verified_at === null">
                 <p class="text-sm mt-2 text-foreground">
                     Your email address is unverified.
                     <Link

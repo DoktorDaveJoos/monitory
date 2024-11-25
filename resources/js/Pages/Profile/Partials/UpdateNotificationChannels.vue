@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useForm } from '@inertiajs/vue3';
+import { useForm, usePage } from '@inertiajs/vue3';
 import { Label } from '@/Components/ui/label';
 import { Button } from '@/Components/ui/button';
 import { Checkbox } from '@/Components/ui/checkbox';
@@ -16,11 +16,8 @@ import {
 import { Input } from '@/Components/ui/input';
 import InputError from '@/Components/InputError.vue';
 import { ref } from 'vue';
-import { ResourceItem, User } from '@/types';
 
-const props = defineProps<{
-    user: ResourceItem<User>;
-}>();
+const user = usePage().props.auth.user;
 
 const form = useForm<{
     settings: {
@@ -31,11 +28,11 @@ const form = useForm<{
         };
     };
 }>({
-    settings: { ...props.user.data.settings },
+    settings: { ...user.data.settings },
 });
 
 const channelForm = useForm({
-    channel: props.user.data.slack_connection?.channel ?? '',
+    channel: user.data.slack_connection?.channel ?? '',
 });
 
 const updateSlackChannelModal = ref(false);

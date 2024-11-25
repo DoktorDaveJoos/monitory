@@ -3,7 +3,6 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Attribute;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -49,10 +48,6 @@ class User extends Authenticatable implements MustVerifyEmail
         'settings',
     ];
 
-    protected $casts = [
-        'settings' => 'array',
-    ];
-
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -91,6 +86,7 @@ class User extends Authenticatable implements MustVerifyEmail
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'settings' => 'array',
         ];
     }
 }
